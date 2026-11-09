@@ -74,10 +74,10 @@ anything of its own.
 | Nexa Web (browser) | ✅ (the only supported platform for this release) |
 
 Supported platform for this release: **Nexa Web only.**
-Any reference to a Desktop client in `docs/` describes development
-evidence from a non-public dev environment — **not** an advertised
-compatibility promise. Custom CSS is the installation mechanism on
-Nexa Web, and the theme file is plain CSS.
+Some development history in `docs/` mentions other platforms; those
+entries describe internal test evidence from a non-public dev
+environment — **not** compatibility promises. Custom CSS is the
+installation mechanism on Nexa Web, and the theme file is plain CSS.
 
 ## Known limitations
 - Dark-only: under a Light preset the stylesheet stays inert (by design).

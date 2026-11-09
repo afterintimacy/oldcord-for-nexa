@@ -109,7 +109,7 @@ All notable changes to Oldcord for Nexa are documented in this file.
   round-trip; zero theme console errors on the tested surfaces;
   `?safe` recovery path documented.
 - Final classification at this release: PASS (see
-  `docs/DELIVERY.md` for the Phase-12 run record; the Electron dev
+  `docs/DELIVERY.md` for the Phase-12 run record; the dev-client
   runs recorded there are development evidence, not a platform
   support claim — see Phase 13.1). Supported platform for this
   release: **Nexa Web only**.

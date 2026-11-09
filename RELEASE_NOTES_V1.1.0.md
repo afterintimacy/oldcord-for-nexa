@@ -66,7 +66,7 @@ runtime areas verified with real components and computed styles:
 banner images (popout + modal), avatar-derived tint (`--profile-tint`
 exactly the served dominant color), Profile Designer live preview
 with real hex-input + Save flows, and the public page (`/@bob`,
-logged-out, desktop + 411×914). The media pipeline being unavailable,
+logged-out, 1366×768 + 411×914 viewports). The media pipeline being unavailable,
 valid PNG fixture bytes were served via route interception; every
 other behavior was backend-real. See the Phase 15.1 addendum in
 `docs/TEST_REPORT.md` (§16–§21). No CSS line changed in this phase

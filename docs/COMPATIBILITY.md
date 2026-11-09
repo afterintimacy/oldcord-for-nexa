@@ -15,9 +15,9 @@ expects a theme to be written.
 | Web (browser) | ✅ Supported | Chrome 100+, Firefox 118+, Safari 16+, Edge — all features used (custom properties, color-mix, :has) are baseline since 2023 |
 
 Other platforms are not supported and no compatibility is claimed or
-verified for them. (Any mention of a desktop client under `docs/`
-is historical development evidence — see TEST_REPORT — not a
-compatibility promise.)
+verified for them. Mentions of other platforms under `docs/` are
+historical development evidence — see TEST_REPORT — not compatibility
+promises.
 
 **Rule:** Oldcord for Nexa declares **Nexa Web** the supported and tested platform for this release. Custom CSS only works in the browser. Mobile users keep Nexa's default appearance.
 
