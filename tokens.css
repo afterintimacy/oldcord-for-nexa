@@ -1,0 +1,172 @@
+/* ===========================================================================
+   OldCord for Nexa — Design Tokens
+   ---------------------------------------------------------------------------
+   Source reference: milbits/oldcord v2.1 (MIT) vars.css + color.css.
+   Target engine: zeygoober/nexa main (React + TypeScript + CSS Modules).
+
+   OldCord re-defines Discord's dark theme back to its 2020 values:
+     --background-primary #36393F (primary-600)   message area
+     --background-secondary #2F3136 (primary-630) sidebar / cards
+     --background-secondary-alt #292B2F (primary-660)
+     --background-tertiary #202225 (primary-700)  rail / darkest
+     --background-floating #18191C (primary-800)  menus, popovers
+     --channels-default #8E9297                   channel names
+     --interactive-text-default #B9BBBE
+     --interactive-text-hover #DCddde, active #FFFFFF
+     --text-muted #72767D
+   Blurple (brand-experiment): hsl(227 58% 65%) = #7288DA (2020 blurple).
+   Green hsl(153 46% 49%), Red hsl(0 85% 61%), Yellow hsl(38 96% 54%).
+
+   This file maps those values onto Nexa's official 61 custom properties
+   (docs/custom-css.md, web/src/lib/look/tokens.ts). Values are written in
+   hsl() exactly as OldCord ships them where a hex would be approximated.
+
+   Scoping: everything lives under [data-scheme="dark"]. There is no
+   data-look="oldcord" in Nexa; the theme is dark-only, so a user on a
+   Light preset keeps the stock light palette instead of a hybrid look.
+
+   IMPORTANT: Only variable names that already exist in Nexa are overridden
+   (--bg-base, --brand, etc.). No new globals are invented that could
+   collide with Nexa internals. The --oc-* names below are internal aliases
+   so every value is traceable to one OldCord source line; they are never
+   read by Nexa itself.
+   =========================================================================== */
+
+/* --- internal source values (OldCord vars.css, dark theme) --------------- */
+:root {
+  /* primary shades — Discord 2020 surface ladder */
+  --oc-primary-500: hsl(217 8% 34%);   /* #50555E — OldCord button-secondary base */
+  --oc-primary-600: hsl(220 8% 23%);   /* #36393F — background-primary */
+  --oc-primary-630: hsl(223 7% 20%);   /* #2F3136 — background-secondary */
+  --oc-primary-660: hsl(220 7% 17%);   /* #292B2F — background-secondary-alt */
+  --oc-primary-700: hsl(216 7% 14%);   /* #202225 — background-tertiary */
+  --oc-primary-800: hsl(220 8% 10%);   /* #18191C — background-floating */
+
+  /* text / interaction */
+  --oc-text-normal: hsl(226 6% 91%);   /* #DCddde — interactive-text-hover */
+  --oc-text-faint: hsl(228 7% 73%);    /* #B9BBBE — interactive-text-default */
+  --oc-text-muted: #72767d;            /* --text-muted */
+  --oc-text-channel: #8e9297;          /* --channels-default */
+  --oc-link: hsl(199 100% 49%);        /* #00AFF4 — text-link (light & dark) */
+
+  /* accent + feedback */
+  --oc-blurple: hsl(227 58% 65%);      /* brand-experiment = #7288DA (2020 blurple) */
+  --oc-blurple-hover: hsl(227 44% 59%);/* blurple-hover ≈ #4752C4 */
+  --oc-blurple-active: hsl(226 34% 52%);/* blurple-active ≈ #384CBB */
+  --oc-green: hsl(153 46% 49%);        /* --green */
+  --oc-green-hover: hsl(153 46% 44%);
+  --oc-red: hsl(0 85% 61%);            /* --red ≈ #ED4245 */
+  --oc-red-hover: hsl(0 66% 55%);
+  --oc-yellow: hsl(38 96% 54%);        /* --yellow ≈ #FAA61A */
+  --oc-offline: #747f8d;               /* Discord 2020 offline grey */
+
+  /* interaction washes — background-mod-subtle / muted / strong */
+  --oc-hover: hsla(217 8% 34% / 0.16);
+  --oc-active: hsla(217 8% 34% / 0.24);
+  --oc-selected: hsla(217 8% 34% / 0.32);
+  --oc-msg-hover: hsla(240 11% 2% / 0.07);
+  --oc-mentioned: hsla(38 96% 54% / 0.051);
+  --oc-mentioned-hover: hsla(38 96% 54% / 0.078);
+
+  /* type — Whitney is not redistributed (license unverified); Atkinson
+     Hyperlegible is the closest freely-licensed humanist face, per Nexa's
+     own Custom CSS example. Emoji stays Twemoji Text (Nexa's rule). */
+  --oc-font: "Twemoji Text", "Atkinson Hyperlegible", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --oc-font-display: "Twemoji Text", "Atkinson Hyperlegible", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --oc-font-mono: "JetBrains Mono", "Fira Code", ui-monospace, "Cascadia Mono", Consolas, monospace;
+}
+
+/* --- Nexa token overrides ------------------------------------------------ */
+[data-scheme="dark"] {
+  /* backgrounds */
+  --bg-base: var(--oc-primary-630);        /* sidebar / members / left panels */
+  --bg-raised: var(--oc-primary-600);      /* message area */
+  --bg-surface: var(--oc-primary-660);     /* cards, embeds sit on this value */
+  --bg-floating: var(--oc-primary-800);    /* menus, popovers */
+  --bg-input: rgba(0, 0, 0, 0.1);         /* OldCord --input-background-default */
+  --bg-composer: rgba(0, 0, 0, 0.1);      /* message box, OldCord channelTextArea */
+  --embed-bg: var(--oc-primary-630);      /* link preview cards (OldCord .box) */
+  --bg-overlay: hsla(216 7% 14% / 0.7);    /* modal backdrop */
+
+  /* interaction surfaces */
+  --bg-hover: var(--oc-hover);
+  --bg-selected: var(--oc-selected);
+  --bg-active: var(--oc-active);
+  --bg-message-hover: var(--oc-msg-hover);
+  --scroll-thumb: var(--oc-primary-700);   /* OldCord scrollbar-auto-thumb */
+  --scroll-thumb-hover: var(--oc-primary-800);
+
+  /* text */
+  --text: var(--oc-text-normal);
+  --text-strong: #ffffff;
+  --text-subtle: var(--oc-text-faint);
+  --text-muted: var(--oc-text-muted);
+  --text-channel: var(--oc-text-channel);
+  --text-placeholder: var(--oc-text-muted);
+  --icon: var(--oc-text-faint);
+  --link: var(--oc-link);
+
+  /* accent — blurple */
+  --brand: var(--oc-blurple);
+  --brand-hover: var(--oc-blurple-hover);
+  --brand-active: var(--oc-blurple-active);
+  --on-brand: #ffffff;
+  --text-brand: var(--oc-blurple);
+  --focus-ring: var(--oc-blurple);
+  --mention-bg: var(--oc-mentioned);
+  --mention-bg-hover: var(--oc-mentioned-hover);
+  --mention-fg: #fee0b3;                  /* Discord 2020 mention text */
+
+  /* borders — OldCord elevation-stroke / hairlines are black, not violet */
+  --border-subtle: rgba(0, 0, 0, 0.12);
+  --border: rgba(0, 0, 0, 0.2);
+  --border-strong: rgba(0, 0, 0, 0.35);
+
+  /* status */
+  --positive: var(--oc-green);
+  --positive-hover: var(--oc-green-hover);
+  --warning: var(--oc-yellow);
+  --text-warning: var(--oc-yellow);
+  --danger: var(--oc-red);
+  --danger-hover: var(--oc-red-hover);
+  --text-danger: var(--oc-red);
+  --status-online: var(--oc-green);
+  --status-idle: var(--oc-yellow);
+  --status-dnd: var(--oc-red);
+  --status-offline: var(--oc-offline);
+
+  /* code / tooltip / spoiler — OldCord redesign.css (github-dark roles) */
+  --code-bg: var(--oc-primary-630);       /* .hljs background-base-lowest */
+  --code-border: var(--oc-primary-700);   /* .hljs 1px primary-700 */
+  --code-keyword: #79c0ff;
+  --code-string: #a5d6ff;
+  --code-number: #79c0ff;
+  --code-comment: #8b949e;
+  --code-title: #d2a8ff;
+  --code-type: #ffa657;
+  --code-variable: #79c0ff;
+  --tooltip-bg: #000000;
+  --tooltip-text: #f2f3f5;
+  --spoiler: var(--oc-primary-700);       /* --__spoiler-background-color--hidden */
+  --spoiler-revealed: rgba(255, 255, 255, 0.1); /* OldCord revealed wash */
+
+  /* geometry — Discord 2020 proportions (rail 72, sidebar 240, header 48) */
+  --rail-w: 72px;
+  --sidebar-w: 240px;
+  --members-w: 240px;
+  --header-h: 48px;
+
+  /* shape — flat 2020 corners (buttons 3px, menus 4px, modals 5px) */
+  --radius-xs: 2px;
+  --radius-sm: 3px;
+  --radius-md: 4px;
+  --radius-lg: 5px;
+  --radius-xl: 6px;
+  --radius-pill: 999px;
+
+  /* typeface */
+  --font: var(--oc-font);
+  --font-display: var(--oc-font-display);
+  --font-with-emoji: var(--oc-font);
+  --font-mono: var(--oc-font-mono);
+}

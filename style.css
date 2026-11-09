@@ -1,0 +1,291 @@
+/* ============================================================================
+   OldCord for Nexa — Component Styles
+   ----------------------------------------------------------------------------
+   Source reference: milbits/oldcord v2.1 (MIT) — redesign.css, color.css,
+   profile.css. Target engine: zeygoober/nexa main (React + TypeScript +
+   CSS Modules).
+
+   Selection strategy (see docs/custom-css.md "Selecting Things"):
+     1. Custom properties (tokens.css does the bulk of the work).
+     2. Attributes on <html> and on messages ([data-scheme],
+        [role="article"][data-mentioned="true"], [role="toolbar"], ...).
+     3. Stable plain classes from rendered markdown (.md-*).
+     4. Stable prefix of a hashed CSS-Modules class: [class*="_local_"],
+        ALWAYS scoped by an ancestor module class, role, or data attribute
+        whenever several modules share a local name (row, card, item,
+        btn, pill, box, pop, ...).
+
+   How Nexa's CSS Modules hash class names (verified by building the app
+   with Vite in Phase 11 and inspecting dist/assets/*.css): there is NO
+   module-name prefix in the output. Every generated class looks like
+     _rail_1143b_339, _btn_q2lzi_111, _msg_xY12z_98
+   i.e. _ + local-class-name + _ + hash + _ + index. So the only reliable
+   anchors are the local-name prefix plus ancestry/attribute narrowing,
+   exactly as docs/custom-css.md describes. Never target the build's
+   hash suffix, and never assume a ModuleName prefix exists.
+
+   OldCord's CSS was written for Discord's DOM (`.wrapper_JJ-hgR`,
+   `.menu_M3qk4j`, ...). Those hashed names do NOT exist in Nexa, so
+   nothing here targets them. No external resources except the optional
+   Google Fonts @import for Atkinson Hyperlegible at the end.
+   ========================================================================== */
+
+/* ── SERVER RAIL: icon geometry + hover/selected ring ──────────────────────
+   Discord 2020 guild tiles: 48-50px, circle by default (radius 25px),
+   morphing to a squarer silhouette on hover (16px) / selected (15px),
+   filled blurple as it does so (redesign.css `.wrapper_JJ-hgR`).
+   Nexa tiles are 48px with a 4px edge indicator (`.pill`). We adjust
+   radius + fill + trim the glow; the indicator and layout are untouched.
+
+   Nexa sources: web/src/components/rail/{Rail.tsx,Rail.module.css}
+   (.item[data-selected|data-unread] > .pill + .btn[.hasIcon]) */
+[data-scheme="dark"] [class*="_rail_"] [class*="_btn_"] {
+  border-radius: 50%;
+  transition:
+    border-radius 0.2s ease,
+    background-color 0.2s ease,
+    color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+[data-scheme="dark"] [class*="_rail_"] [class*="_item_"][data-selected="true"] [class*="_btn_"],
+[data-scheme="dark"] [class*="_rail_"] [class*="_item_"]:hover [class*="_btn_"] {
+  border-radius: 15px;
+  background: var(--brand);
+  color: #fff;
+  transform: none;
+  box-shadow: none;
+}
+[data-scheme="dark"] [class*="_rail_"] [class*="_item_"]:hover [class*="_btn_"] {
+  border-radius: 16px;
+}
+/* OldCord .outer_ERB-Vv: the selected picture tile carries a dark ring
+   of its own (primary-700) instead of Nexa's accent glow ring. */
+[data-scheme="dark"] [class*="_rail_"] [class*="_item_"][data-selected="true"] [class*="_btn_"][class*="_hasIcon_"] {
+  background: var(--brand);
+  box-shadow: 0 0 0 2px #202225;
+}
+/* The edge indicator sits on the rail canvas, never over the icon; in
+   2020 it is a flat white bar with no accent glow. */
+[data-scheme="dark"] [class*="_rail_"] [class*="_item_"][data-selected="true"] [class*="_pill_"] {
+  background: #fff;
+  box-shadow: none;
+}
+/* add-server plus: solid green disc when lit (OldCord circle icon). */
+[data-scheme="dark"] [class*="_rail_"] [class*="_add_"]:hover [class*="_btn_"] {
+  background: var(--positive);
+  color: #fff;
+}
+
+/* ── SIDEBAR: channel rows ─────────────────────────────────────────────────
+   Nexa sources: web/src/components/sidebar/ServerSidebar.module.css
+   (.row[data-selected|data-unread] ... .icon). Selected row glyphs are
+   full white in 2020 (interactive-text-active), not the accent. */
+[data-scheme="dark"] [class*="_sidebar_"] [class*="_row_"][data-selected="true"] [class*="_icon_"] {
+  color: #fff;
+}
+/* Category headers (`.catHead`, ServerSidebar only): the old eyebrow
+   letter-spacing is what gives the 2020 list its rhythm. */
+[data-scheme="dark"] [class*="_sidebar_"] [class*="_catHead_"] {
+  letter-spacing: 0.04em;
+}
+
+/* ── CHAT: mentioned rows ──────────────────────────────────────────────────
+   Nexa sources: web/src/components/chat/MessageItem.tsx renders
+   `<div class="msg" role="article" data-mentioned>` (docs/custom-css.md
+   guarantees these data attributes). OldCord mentioned rows are an
+   amber wash (rgba(250,166,26,0.051)) with a 2px flush bar of
+   --yellow, not the accent-tinted bar Nexa ships. */
+[data-scheme="dark"] [role="article"][data-mentioned="true"] {
+  background: var(--oc-mentioned);
+}
+[data-scheme="dark"] [role="article"][data-mentioned="true"]::before {
+  background: var(--oc-yellow);
+  box-shadow: none;
+  width: 2px;
+  border-radius: 0;
+}
+
+/* ── CHAT: rendered markdown ───────────────────────────────────────────────
+   .md-inline-code and .md-quote are plain stable classes
+   (styles/markdown.css). Colours come from tokens; only the inline
+   code corner and the quote bar needed the 2020 touch. */
+[data-scheme="dark"] .md-inline-code {
+  border-radius: 3px;
+}
+[data-scheme="dark"] .md-quote {
+  border-inline-start: 3px solid var(--oc-selected);
+}
+
+/* ── CHAT: message actions toolbar ─────────────────────────────────────────
+   MessageItem renders `<div class="toolbar" role="toolbar">` — a stable
+   role anchor (Nexa sources: chat/MessageItem.tsx line ~580). OldCord
+   draws the actions box as primary-630 (public row) with a 1px
+   primary-630 border and 4px corners (.buttonContainer_2i8Bfm). */
+[data-scheme="dark"] [role="toolbar"] {
+  background: var(--bg-raised);
+  border: 1px solid var(--oc-primary-630);
+  border-radius: 4px;
+}
+
+/* ── CHAT: reaction pills ───────────────────────────────────────────────────
+   OldCord reaction chips are squared (0.25rem), not fully pill-shaped:
+   .reactions > .pill in Chat.module.css. The `_reactions_` prefix exists
+   only in the Chat module, so this cannot bleed into Profile pills. */
+[data-scheme="dark"] [class*="_reactions_"] [class*="_pill_"] {
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.06);
+  border: none;
+}
+[data-scheme="dark"] [class*="_reactions_"] [class*="_pill_"][data-me="true"] {
+  background: hsla(227 58% 65% / 0.3);
+  border: none;
+  color: #fff;
+}
+
+/* ── COMPOSER ──────────────────────────────────────────────────────────────
+   The message box is Composer.module's `.box`. `_box_` is a shared local
+   (Composer, Files, editors...), but the composer box is the only `.box`
+   that also contains an attach button and a button cluster, so the
+   `:has()` narrowing targets exactly it. Nexa sources:
+   components/composer/{Composer.tsx,Composer.module.css}. */
+[data-scheme="dark"] [class*="_box_"]:has([class*="_attach_"]):has([class*="_btns_"]) {
+  background: var(--bg-composer);
+}
+[data-scheme="dark"] [class*="_box_"]:has([class*="_attach_"]):has([class*="_btns_"]):focus-within {
+  box-shadow:
+    0 0 0 1px var(--border),
+    0 0 0 4px color-mix(in srgb, var(--brand) 10%, transparent),
+    var(--shadow-medium);
+}
+
+/* ── CONTEXT MENUS ─────────────────────────────────────────────────────────
+   OldCord hover fill: brand-experiment-560 (hsl(227 35% 53%)) with white
+   text; pressed/expanded: brand-experiment-600. Nexa sources:
+   components/common/ContextMenu.{tsx,module.css} — `.menu > .item`,
+   `.item.danger`. Scoped by `_menu_` ancestry so the Look/Builder
+   `.item` rows are untouched: Builder's menu children are `.btn`,
+   and Look's `.item` lives outside any `.menu` element. */
+[data-scheme="dark"] [class*="_menu_"] [class*="_item_"]:hover,
+[data-scheme="dark"] [class*="_menu_"] [class*="_item_"]:focus-visible {
+  background: hsl(227 35% 53%);
+  color: #fff;
+  box-shadow: none;
+}
+[data-scheme="dark"] [class*="_menu_"] [class*="_item_"]:active,
+[data-scheme="dark"] [class*="_menu_"] [class*="_item_"][aria-expanded="true"] {
+  background: hsl(227 31% 44%);
+  color: #fff;
+  box-shadow: none;
+}
+[data-scheme="dark"] [class*="_menu_"] [class*="_item_"][class*="_danger_"]:hover {
+  background: hsl(0 85% 61%);
+  color: #fff;
+  box-shadow: none;
+}
+
+/* ── BUTTONS (the shared Button component) ─────────────────────────────────
+   Nexa sources: components/common/Button.{tsx,module.css} — every
+   variant is applied together with `.btn` on one element
+   (`[s.btn, s[variant], s[size], ...]`), so requiring BOTH class
+   fragments on the same element targets only that component:
+   Profile's `.primary`, rail `.btn`, Builder's `.btn` never carry the
+   combination. Primary = flat blurple (no sheen), secondary =
+   primary-500 grey, danger/positive = flat 2020 fills. */
+[data-scheme="dark"] [class*="_btn_"][class*="_primary_"] {
+  background: var(--brand);
+  box-shadow: none;
+}
+[data-scheme="dark"] [class*="_btn_"][class*="_primary_"]:hover:not(:disabled) {
+  background: var(--brand-hover);
+  box-shadow: none;
+}
+[data-scheme="dark"] [class*="_btn_"][class*="_primary_"]:active:not(:disabled) {
+  background: var(--brand-active);
+  box-shadow: none;
+}
+[data-scheme="dark"] [class*="_btn_"][class*="_secondary_"] {
+  background: var(--oc-primary-500);
+  color: #fff;
+  box-shadow: none;
+}
+[data-scheme="dark"] [class*="_btn_"][class*="_secondary_"]:hover:not(:disabled) {
+  background: var(--oc-text-muted);
+  color: #fff;
+  box-shadow: none;
+}
+[data-scheme="dark"] [class*="_btn_"][class*="_danger_"] {
+  background: var(--danger);
+  box-shadow: none;
+}
+[data-scheme="dark"] [class*="_btn_"][class*="_danger_"]:hover:not(:disabled) {
+  background: var(--danger-hover);
+  box-shadow: none;
+}
+[data-scheme="dark"] [class*="_btn_"][class*="_positive_"] {
+  background: var(--positive);
+  box-shadow: none;
+}
+[data-scheme="dark"] [class*="_btn_"][class*="_positive_"]:hover:not(:disabled) {
+  background: var(--oc-green-hover);
+  box-shadow: none;
+}
+
+/* ── EMBEDS (link previews) ────────────────────────────────────────────────
+   Discord 2020 embeds: 4px left bar in background-accent (#4F545C) on
+   primary-630. Nexa draws the bar from --brand; here it is the accent.
+   Nexa sources: components/chat/Embeds.{tsx,module.css} — `.embeds >
+   .item > .card`. The `_embeds_` prefix is shared with the Webhook
+   module, where the same embed card is drawn, so the rule is correct
+   for both. */
+[data-scheme="dark"] [class*="_embeds_"] [class*="_card_"] {
+  border-inline-start: 4px solid var(--oc-primary-500);
+}
+
+/* ── PROFILE (popout & modal) ──────────────────────────────────────────────
+   OldCord popout: shell primary-630, header block primary-700, sheet
+   sections primary-660. Nexa sources:
+   components/profile/ProfileCard.tsx (data-variant="popout|modal|
+   panel" on the card element) + Profile.module.css (.card, .banner,
+   .sheet). The [data-variant] attribute is what isolates profile cards
+   from the ~20 other `.card` components; .banner/.sheet are only
+   reached inside that scope. */
+[data-scheme="dark"] [class*="_card_"][data-variant="popout"],
+[data-scheme="dark"] [class*="_card_"][data-variant="modal"] {
+  background: var(--oc-primary-630);
+  border-radius: 5px;
+}
+[data-scheme="dark"] [class*="_card_"][data-variant="popout"] [class*="_banner_"],
+[data-scheme="dark"] [class*="_card_"][data-variant="modal"] [class*="_banner_"] {
+  background: var(--oc-primary-700);
+}
+[data-scheme="dark"] [class*="_card_"][data-variant="popout"] [class*="_sheet_"],
+[data-scheme="dark"] [class*="_card_"][data-variant="modal"] [class*="_sheet_"] {
+  background: var(--oc-primary-660);
+}
+
+/* ── PICKER (emoji / stickers / gifs) ──────────────────────────────────────
+   Nexa sources: components/pickers/Picker.module.css (`.pop` — the
+   498px pop layer; `.pop` is also a local in UserPanel and ServerTag,
+   but only Picker's pop contains an emoji `.grid`). 2020 radius 8px. */
+[data-scheme="dark"] [class*="_pop_"]:has([class*="_grid_"]) {
+  border-radius: 8px;
+}
+
+/* ── Threads, member list, tooltips, popovers, scrollbars, members ────────
+   All of these draw from tokens (bg-hover, bg-floating, scroll-thumb,
+   tooltip-bg, text-channel...), which tokens.css already maps to the
+   2020 palette. Nexa's own Rules (Chat/Threads/MemberList modules) are
+   already OldCord-shaped — the member rows get their radius from
+   --radius-sm (3px) automatically. No extra component rules needed. */
+
+/* ── Reduced motion ─────────────────────────────────────────────────────────
+   This theme introduces no animations of its own; the app's `[data-reduced-
+   motion]`, `@media (prefers-reduced-motion)`, and `--font-scale` contracts
+   are untouched. */
+
+/* Optional: Atkinson Hyperlegible via Google Fonts.
+   Nexa does not bundle it and Whitney is not redistributed. Delete this
+   block if you want zero external requests; the system-ui fallback still
+   applies. @import must be the first rule of its stylesheet, so this
+   snippet lives at the end of the component file and the build places it
+   first in the combined file. */
