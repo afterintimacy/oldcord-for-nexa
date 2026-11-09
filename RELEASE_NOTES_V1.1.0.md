@@ -59,6 +59,20 @@ verified — the scratch backend's media pipeline returns 500 for
 image uploads, and inline `background-image` cannot be overridden
 by stylesheet rules anyway.
 
+### Phase 15.1 (2026-11-09)
+
+A full re-verification on a fresh isolated scratch environment
+(wiped DB, re-seeded; new scratch ids). All four previously-blocked
+runtime areas verified with real components and computed styles:
+banner images (popout + modal), avatar-derived tint (`--profile-tint`
+exactly the served dominant color), Profile Designer live preview
+with real hex-input + Save flows, and the public page (`/@bob`,
+logged-out, desktop + 411×914). The media pipeline being unavailable,
+valid PNG fixture bytes were served via route interception; every
+other behavior was backend-real. See the Phase 15.1 addendum in
+`docs/TEST_REPORT.md` (§16–§21). No CSS line changed in this phase
+(23,505 B, SHA-256 `b3202b0b…` across all runs).
+
 ## Install
 
 Same file, same URL. Refresh or re-paste; Nexa re-fetches links

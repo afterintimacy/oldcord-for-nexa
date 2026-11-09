@@ -203,6 +203,19 @@ profiles. The theme therefore preserves Nexa's banner. The fix would
 be one `data-banner-accent` attribute in `ProfileCard.tsx` — a Nexa
 source change, which this standalone theme deliberately does not make.
 
+**Data-attribute upstream evaluation (Phase 15.1 §8/§9).** A stable
+attribute would be useful upstream: when a banner derives from a
+user-selected accent (`profileTheme(user.accent_color, null, user.id)` —
+i.e. the banner has an accent color) vs. the deterministic
+`avatarColor(id)` fallback, a `data-banner-accent` attribute on the
+banner element (or on the card, alongside `data-themed`/`data-tinted`)
+would let a stylesheet distinguish them without hardcoding the six
+palette values. It is a one-line Nexa change, clearly scoped, and
+matches the app's own attribute-driven theming (`data-themed`,
+`data-tinted` already exist). A future OldCord revision could then
+recolor only the fallback banner. Not implemented here per §9 — the
+theme stays CSS-only and the Nexa repo remains untouched.
+
 **Roles (15A-G):** role dots/chips/member names are inline-styled from
 `roleLook.ts` (`style={nameStyle(look)}` on the author button,
 `MessageItem.tsx:394`); no theme rule targets them, so server role

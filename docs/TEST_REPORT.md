@@ -586,3 +586,22 @@ documented platform constraint (CSS cannot distinguish Nexa's
 `avatarColor` header from a chosen single accent, see
 IMPLEMENTATION.md) and the fixture caveats in §19. Nothing ships
 without explicit approval.
+
+## 21. Re-run on a fresh isolated environment (2026-11-09, second pass)
+
+The same suite was re-executed from scratch before final sign-off:
+the scratch backend was wiped (`chatd` data dir recreated) and
+re-seeded, producing new ids (server `113354957184303104`, channel
+`113354957192691714`, bob `113354938230243328`). Results identical
+to §17–§20: `--profile-tint #1ea05a` (exact), `--profile-tint
+#4f33b0` (banner), gradient `rgb(139,14,30)→rgb(255,107,107)` /
+white→pink, sheets `rgba(0,0,0,0.3)`/`rgba(255,255,255,0.42)`,
+roles (`#ED4245` name, dots exact, names readable on gradients),
+panel (`data-themed=light`, gradient intact, sheet translucent),
+public (`@bob`, themed + banner, 411×914 one-column). CSS hashes
+identical (`b3202b0b…`, `158390c8…`, `d922999d…`); the re-run
+validates the phase end-to-end on a disposable env, not a reopened
+one. The `chatd` storage startup had one flaky window while the
+backend was reaped between shell sessions (no panic trace; startup
+logs clean) — operationally irrelevant to the theme and noted for
+transparency.
