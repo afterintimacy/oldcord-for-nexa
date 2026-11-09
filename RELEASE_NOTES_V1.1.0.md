@@ -1,8 +1,7 @@
 # OldCord for Nexa — v1.1.0 release notes
 
-**Status:** release candidate — **not yet published**. Tagged and
-published separately after explicit approval. The published v1.0.0
-release is unchanged.
+**Status:** published 2026-11-09 (annotated tag `v1.1.0` → `ea26fa2`).
+The published v1.0.0 release is unchanged.
 
 ## What changed
 

@@ -72,14 +72,12 @@ anything of its own.
 | Platform | Supported |
 | --- | --- |
 | Nexa Web (browser) | ✅ (the only supported platform for this release) |
-| Nexa Desktop (Electron) | ⚠️ **Not advertised.** The theme was never validated in a packaged Desktop build and no compatibility is claimed. (Early development builds ran inside a dev environment — that evidence is recorded in `docs/TEST_REPORT.md`, but it is not a support promise.) |
-| Nexa Android | ❌ Custom CSS is not executed there (Nexa constraint) |
 
 Supported platform for this release: **Nexa Web only.**
 Any reference to a Desktop client in `docs/` describes development
 evidence from a non-public dev environment — **not** an advertised
 compatibility promise. Custom CSS is the installation mechanism on
-all platforms, and the theme file is plain CSS.
+Nexa Web, and the theme file is plain CSS.
 
 ## Known limitations
 - Dark-only: under a Light preset the stylesheet stays inert (by design).
@@ -95,7 +93,7 @@ all platforms, and the theme file is plain CSS.
 ## Report an issue
 Open an issue in this repository with:
 1. The `oldcord.css` version/commit you installed,
-2. browser or Desktop app version,
+2. browser (and OS) version,
 3. a screenshot of the broken state,
 4. whether it reproduces with and without the theme.
 

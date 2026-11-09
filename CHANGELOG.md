@@ -2,7 +2,7 @@
 
 All notable changes to Oldcord for Nexa are documented in this file.
 
-## [1.1.0] — 2026-11-09 (candidate — not yet published)
+## [1.1.0] — 2026-11-09 (published)
 
 ### Added
 - Profile color adaptation (Phase 15): the theme no longer overrides
