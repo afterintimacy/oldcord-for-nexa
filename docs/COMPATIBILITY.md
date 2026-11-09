@@ -12,13 +12,12 @@ expects a theme to be written.
 
 | Aspect | Status | Notes |
 | --- | --- | --- |
-| Web (browser) | ✅ Supported | Chrome 100+, Firefox 118+, Safari 16+, Edge — all features used (custom properties, color-mix, :has not required) are baseline since 2023 |
-| Desktop (Electron) | ✅ Supported | Inherits Chromium engine; no web-only API used |
+| Web (browser) | ✅ Supported | Chrome 100+, Firefox 118+, Safari 16+, Edge — all features used (custom properties, color-mix, :has) are baseline since 2023 |
+| Desktop (Electron) | ⚠️ **Not advertised** | Nexa has no public Desktop release; compatibility is not claimed or verified. (Historical dev evidence only — see TEST_REPORT.) |
 | Android (Kotlin/Compose) | ❌ Not supported | Custom CSS is not executed on Android (Nexa docs) |
 | iOS | ❌ Not supported | Same |
 
-**Rule:** Custom CSS only works in browser or desktop app. Mobile
-users keep Nexa's default appearance.
+**Rule:** Oldcord for Nexa declares **Nexa Web** the supported and tested platform for this release. Custom CSS only works in the browser. Any reference to a Desktop client in `docs/` is historical development evidence, not a compatibility promise. Mobile users keep Nexa's default appearance.
 
 ---
 

@@ -34,8 +34,10 @@ All notable changes to Oldcord for Nexa are documented in this file.
 - Backend-backed acceptance (scratch Go stack, seeded accounts,
   real channel interactions); theme activation through
   Settings → Custom CSS; persistence across reload; toggle off/on
-  round-trip; Electron client (Electron 44.9.3 / Chromium
-  152.0.7977.167) renders the synced theme with zero theme console
-  errors; `?safe` recovery path documented.
+  round-trip; zero theme console errors on the tested surfaces;
+  `?safe` recovery path documented.
 - Final classification at this release: PASS (see
-  `docs/DELIVERY.md` for the Phase-12 run record).
+  `docs/DELIVERY.md` for the Phase-12 run record; the Electron dev
+  runs recorded there are development evidence, not a platform
+  support claim — see Phase 13.1). Supported platform for this
+  release: **Nexa Web only**.

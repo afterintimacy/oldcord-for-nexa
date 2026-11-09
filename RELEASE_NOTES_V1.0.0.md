@@ -29,8 +29,9 @@ Discord-2020 look onto Nexa's official Custom CSS system.
 - Nexa `zeygoober/nexa` `main` @ `3a2ceb95f007372cdcc70138afb247df6e204df6`
 - Scratch Go backend 1.27.3 (`chatd` built and seeded per
   `tools/seed.py` pattern) and Chromium (Playwright)
-- Nexa Desktop dev client: Electron **44.9.3**, Chromium
-  **152.0.7977.167** (`/json/version` confirmed)
+- Some runs also used a Nexa Desktop **development** build
+  (Electron 44.9.3) purely as a dev-quality environment; it is not a
+  release platform and no compatibility is claimed for it.
 - Zero theme-caused console errors; repo untouched.
 
 ## Known limitations

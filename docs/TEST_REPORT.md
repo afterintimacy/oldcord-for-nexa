@@ -44,7 +44,7 @@ oldcord.css: OK, 36 rules   ( @import + tokens + style )
 ## 2. Source-level audit
 
 ```
-$ python C:\Users\Vino\AppData\Local\Temp\opencode\oc-audit.py
+$ python <scratch>\\oc-audit.py
 
 oc-* internal vars: 29; official tokens set: 72
 FRAG OK  '_add_' '-'_banner_' '_btn_' '_card_' '_catHead_' '_danger_'
@@ -62,7 +62,7 @@ comments before extraction.)
 ## 3. Compiled-CSS verification (the decisive check)
 
 ```
-$ python C:\Users\Vino\AppData\Local\Temp\opencode\oc-fragments.py
+$ python <scratch>\\oc-fragments.py
 
 OK   '_add_'                -> 2 generated classes
 OK   '_attach_'             -> 1 generated classes
@@ -119,7 +119,7 @@ element at the end of `<body>`; `web/src/lib/look/styles.ts`), with
 preset sets):
 
 ```
-$ python C:\Users\Vino\AppData\Local\Temp\opencode\oc-visual.py
+$ python <scratch>\\oc-visual.py
 
 built css: 4213 hashed classes
   FRAG OK   '_add_' ... -> 2 generated classes   (… 25 fragment lines, all OK …)
@@ -139,7 +139,7 @@ Phone console errors (all three, verbatim):
 `net::ERR_CONNECTION_REFUSED` ×3 — the demo page attempted backend
 endpoints (no Go server running). Zero theme-related errors.
 
-Observed on the screenshots (in `C:\Users\Vino\AppData\Local\Temp\opencode\oc-shots\`):
+Observed on the screenshots (in `<scratch>\\oc-shots\`):
 dark 2020-grey surfaces, blurple accents (Sign in, rail selection
 ring), flat square corners, whitespace-consistent chrome.
 
@@ -160,6 +160,11 @@ encryption, calls, search, or persistence.
 ---
 
 ## Phase 12 addendum (real scratch backend + Electron)
+
+**Scope note (Phase 13.1):** Electron evidence in this section is a
+dev-environment record (repo dev client against the scratch backend).
+The v1.0.0 support promise covers **Nexa Web only**; see
+`docs/COMPATIBILITY.md`.
 
 Environment (this machine, 2026-11-08):
 - Git: `nexa-src` @ `3a2ceb9` (origin `zeygoober/nexa`), `git status` clean (0 tracked changes).

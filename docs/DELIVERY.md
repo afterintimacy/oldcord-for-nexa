@@ -104,6 +104,12 @@ colors, typeface, and every component rule are verified.
 
 ## Addendum — Phase 12 (2026-11-08): runtime validation attempt
 
+**Scope note (Phase 13.1):** the Electron runs below are development
+environment evidence only (the repo's own dev client against the
+scratch backend). Oldcord for Nexa v1.0.0 declares **Nexa Web** its
+sole supported platform; Nexa has no public Desktop release, and no
+Desktop compatibility is claimed or advertised.
+
 **Final classification: PASS.** Every gate below was executed for real,
 on a real scratch Go backend and the real Electron client:
 

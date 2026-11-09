@@ -68,12 +68,15 @@ anything of its own.
 ## Compatibility
 | Platform | Supported |
 | --- | --- |
-| Nexa Web (browser) | ✅ |
-| Nexa Desktop (Electron) | ✅ (same CSS engine; theme travels with the account) |
+| Nexa Web (browser) | ✅ (the only supported platform for this release) |
+| Nexa Desktop (Electron) | ⚠️ **Not advertised.** The theme was never validated in a packaged Desktop build and no compatibility is claimed. (Early development builds ran inside a dev environment — that evidence is recorded in `docs/TEST_REPORT.md`, but it is not a support promise.) |
 | Nexa Android | ❌ Custom CSS is not executed there (Nexa constraint) |
 
-The theme follows your account across devices where Custom CSS is
-available. See `docs/COMPATIBILITY.md` for preset/mix details.
+Supported platform for this release: **Nexa Web only.**
+Any reference to a Desktop client in `docs/` describes development
+evidence from a non-public dev environment — **not** an advertised
+compatibility promise. Custom CSS is the installation mechanism on
+all platforms, and the theme file is plain CSS.
 
 ## Known limitations
 - Dark-only: under a Light preset the stylesheet stays inert (by design).
