@@ -241,26 +241,37 @@
   border-inline-start: 4px solid var(--oc-primary-500);
 }
 
-/* ── PROFILE (popout & modal) ──────────────────────────────────────────────
-   OldCord popout: shell primary-630, header block primary-700, sheet
-   sections primary-660. Nexa sources:
-   components/profile/ProfileCard.tsx (data-variant="popout|modal|
-   panel" on the card element) + Profile.module.css (.card, .banner,
-   .sheet). The [data-variant] attribute is what isolates profile cards
-   from the ~20 other `.card` components; .banner/.sheet are only
-   reached inside that scope. */
-[data-scheme="dark"] [class*="_card_"][data-variant="popout"],
-[data-scheme="dark"] [class*="_card_"][data-variant="modal"] {
+/* ── PROFILE (popout / modal / panel) ──────────────────────────────────────
+   The card's colors come from Nexa's profile system (Profile.module.css):
+   .card[data-themed] paints the user's two-accent gradient
+   (linear-gradient(180deg, --profile-top, --profile-bottom)) with
+   data-themed="light|dark" flipping the foreground tokens, and
+   .card[data-tinted] paints the banner/avatar dominant-color glow. The
+   .banner element ALWAYS carries an inline style (background-image for a
+   banner picture, background: transparent with a theme, or a single
+   accent / deterministic fallback color) — inline styles beat every
+   stylesheet rule, so V1.1.0 must not (and does not) restyle .banner at
+   all; removing V1.0.0's dead rule changes nothing visually and keeps
+   banner images intact by construction.
+   What V1.1.0 fixes: V1.0.0 forced `background: primary-630` on
+   popout/modal cards, which out-specified and suppressed the themed
+   gradients AND the tint glow. V1.1.0 applies the classic surfaces only
+   to cards with neither attribute, restoring user customizations while
+   keeping the un-themed look byte-identical to V1.0.0. Geometry is already
+   2020 via the token radii (--radius-lg 5px); no radius rule is needed.
+   Sources: components/profile/ProfileCard.tsx (data-variant="popout|
+   modal|panel", data-themed, data-tinted, --profile-top/--profile-bottom/
+   --profile-tint) + Profile.module.css (.card, .banner, .sheet). */
+[data-scheme="dark"] [class*="_card_"][data-variant="popout"]:not([data-themed]):not([data-tinted]),
+[data-scheme="dark"] [class*="_card_"][data-variant="modal"]:not([data-themed]):not([data-tinted]) {
   background: var(--oc-primary-630);
-  border-radius: 5px;
 }
-[data-scheme="dark"] [class*="_card_"][data-variant="popout"] [class*="_banner_"],
-[data-scheme="dark"] [class*="_card_"][data-variant="modal"] [class*="_banner_"] {
-  background: var(--oc-primary-700);
-}
-[data-scheme="dark"] [class*="_card_"][data-variant="popout"] [class*="_sheet_"],
-[data-scheme="dark"] [class*="_card_"][data-variant="modal"] [class*="_sheet_"] {
-  background: var(--oc-primary-660);
+/* Sheets sit on --sheet-bg; overriding the token (instead of a forced
+   background) lets the themed translucent sheets through untouched. */
+[data-scheme="dark"] [class*="_card_"][data-variant="popout"]:not([data-themed]),
+[data-scheme="dark"] [class*="_card_"][data-variant="modal"]:not([data-themed]),
+[data-scheme="dark"] [class*="_card_"][data-variant="panel"]:not([data-themed]) {
+  --sheet-bg: var(--oc-primary-660);
 }
 
 /* ── PICKER (emoji / stickers / gifs) ──────────────────────────────────────

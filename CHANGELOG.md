@@ -2,6 +2,65 @@
 
 All notable changes to Oldcord for Nexa are documented in this file.
 
+## [1.1.0] — 2026-11-09 (candidate — not yet published)
+
+### Added
+- Profile color adaptation (Phase 15): the theme no longer overrides
+  Nexa's per-user profile system. Un-themed profiles keep the classic
+  OldCord surfaces (`#2F3136` shell, `#292B2F` interior sheet via the
+  `--sheet-bg` token, 5 px radius from `--radius-lg`); two-color profiles
+  show Nexa's own gradient (`--profile-top → --profile-bottom`,
+  `data-themed=light|dark` foreground flip), single-accent profiles keep
+  their banner color, banner images and avatar-derived tints are
+  untouched, and server role colors remain exactly as defined by the
+  server (they are inline-styled; nothing in the theme repaints them).
+- Evidence: `docs/oldcord-nexa/evidence/phase-15/` in the worktree
+  (v1.0.0 baseline vs v1.1.0 computed-style probes + screenshots for
+  popout/modal/panel variants).
+
+### Fixed
+- V1.0.0's unscoped `background` on profile cards (`[class*="_card_"]
+  [data-variant="popout|modal"]`, specificity (0,3,0) vs Nexa's
+  `.card[data-themed]` (0,2,0)) flattened every user's two-color
+  gradient and avatar tint to solid `#2F3136`; the forced sheet
+  background flattened themed sheets' translucency. Both rules are now
+  scoped with `:not([data-themed])` (card additionally
+  `:not([data-tinted])`), so user customizations survive while default
+  profiles look exactly as before.
+- Removed the inert V1.0.0 `.banner` rule: the banner element always
+  carries an inline style (image, `transparent`, or accent/fallback
+  color) which beats any stylesheet rule — the forced `#202225` never
+  rendered. Banner images and single accents are therefore safe *by
+  construction*, and no stylesheet `background` rule may be added back
+  without an `!important` (which would break single accents).
+- README install URL now points at the real repository
+  (`afterintimacy/oldcord-for-nexa/main/oldcord.css`) instead of a
+  placeholder owner.
+
+### Known limitation (CSS-only platform constraint)
+- A profile with no custom colors and no banner keeps Nexa's
+  deterministic per-user banner color (`avatarColor` palette). CSS
+  cannot distinguish that inline fallback from a user's single chosen
+  accent (identical DOM shape), so the theme deliberately preserves
+  Nexa's banner rather than break single-accent profiles. A one-line
+  Nexa-side attribute (`data-banner-accent`) would unlock it in a
+  future theme revision; it is out of scope for a CSS-only theme.
+  See `docs/IMPLEMENTATION.md` § Profile color adaptation.
+
+### Verified
+- Backend-backed profile matrix (scratch Go stack, seeded accounts):
+  default / single-accent / two-color-dark / two-color-light ×
+  popout/modal, plus the DM `panel` variant under two-color-dark.
+  Computed styles prove gradients, `data-themed` foreground flips and
+  the translucent themed sheets are intact under v1.1.0 and were
+  flattened under v1.0.0.
+- Runtime-blocked in scratch (media pipeline 500s): banner-image and
+  avatar-tint cases are covered statically — inline `background-image`
+  always wins over stylesheet rules; tints share the same cascade as
+  the probed two-color gradient.
+- Niche platforms: no one uses it there — CSS changes are profile-scoped
+  only; no other component rule changed.
+
 ## [1.0.0] — 2026-11-08
 
 ### Added

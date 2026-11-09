@@ -15,9 +15,9 @@ the selectors the app's own Custom CSS documentation blesses.
 
 | File | About | Size |
 | --- | --- | --- |
-| `oldcord.css` | The installable file: tokens + component CSS + optional Google Fonts @import (first line). Install via **Settings → Custom CSS → Themes from Links** or paste into a **Snippet**. | 22,485 B (< 64 KB snippet, < 1 MB link) |
+| `oldcord.css` | The installable file: tokens + component CSS + optional Google Fonts @import (first line). Install via **Settings → Custom CSS → Themes from Links** or paste into a **Snippet**. | 23,505 B (< 64 KB snippet, < 1 MB link) |
 | `tokens.css` | Source of the token file above (everything after the @import line). | 7,874 B |
-| `style.css` | Source of the component file above. | 14,504 B |
+| `style.css` | Source of the component file above. | 15,524 B |
 | `README.md` | Install instructions and feature list. | |
 | `IMPLEMENTATION.md` | This file. | |
 | `COMPATIBILITY.md` | Platform matrix, safe mode, failure modes. | |
@@ -160,6 +160,58 @@ Everything's readable at both breakpoints; no layout values were changed
 
 ---
 
+## Profile color adaptation (Phase 15, V1.1.0)
+
+Nexa's profile system (`ProfileCard.tsx` + `Profile.module.css` +
+`lib/avatarColor.ts`) is user-identity-driven:
+
+| State | Nexa renders | OldCord V1.1.0 |
+| --- | --- | --- |
+| `accent_color` + `accent_color_2` | `.card` gets `--profile-top/--profile-bottom`, `data-themed="light|dark"` (foreground tokens flip), `linear-gradient(180deg, top, bottom)`; banner becomes `transparent` so the gradient runs unbroken; sheet gets a translucent `--sheet-bg` + backdrop blur | Rule NOT applied → gradient shows through; geometry via `--radius-lg` (5 px) |
+| Single accent | No `data-themed`; `.banner` gets inline `background: #accent` | Rule applied (un-themed) for the card shell; the inline accent banner is untouched |
+| Banner picture | `.banner` gets inline `background-image: url(…)` | Same — no `.banner` stylesheet rule exists |
+| No colors, with avatar/banner | `data-tinted`, `--profile-tint` from the dominant color of the picture; banner falls back to `profileTheme(a, null, id)` → single accent or the `avatarColor(id)` palette | `:not([data-tinted])` keeps the glow |
+| No colors, no picture | Banner = `avatarColor(id)` palette color (inline) | Shell `#2F3136` + sheet `#292B2F`; banner preserved (constraint below) |
+
+Rules (style.css, PROFILE section):
+
+- Card shell: `[class*="_card_"][data-variant="popout|modal"]:not([data-themed]):not([data-tinted])` → `background: var(--oc-primary-630)` (#2F3136, the 15A-A default surface). Panel needs no card rule: its `background: var(--bg-base)` already resolves to `--oc-primary-630` through tokens.
+- Sheet: `--sheet-bg: var(--oc-primary-660)` (#292B2F) set as a token on
+  `popout|modal|panel` cards `:not([data-themed])` — setting the token
+  (instead of a forced sheet `background`) keeps Nexa's
+  `.sheet { background: var(--sheet-bg) }` intact and lets themed
+  translucent sheets through. Tint glows render under the sheet
+  unchanged.
+- `.banner`: NO stylesheet rule by design. The element always carries
+  an inline style, which beats any author rule — a forced color would
+  also be inert (that was V1.0.0's dead rule, removed in V1.1.0).
+  Adding any `background` rule back requires `!important`, which would
+  clobber single accents — forbidden.
+
+Why V1.1.0 (not V1.0.0) looks different: V1.0.0's unscoped card rule
+won on specificity ((0,3,0) over `.card[data-themed]`'s (0,2,0)) and
+flattened every user gradient to `#2F3136`. Scoping with
+`:not([data-themed])` is the minimal fix; it changes nothing for
+un-themed cards.
+
+**The CSS-only constraint (15A-A vs 15A-C).** The spec asks for a
+`#202225` default banner, but a profile with no colors gets its banner
+color inline (`background: rgb(61, 158, 96)` etc., from `avatarColor`)
+— the same DOM shape as a single chosen accent. No pure-CSS selector
+can distinguish them, and `!important` would break single-accent
+profiles. The theme therefore preserves Nexa's banner. The fix would
+be one `data-banner-accent` attribute in `ProfileCard.tsx` — a Nexa
+source change, which this standalone theme deliberately does not make.
+
+**Roles (15A-G):** role dots/chips/member names are inline-styled from
+`roleLook.ts` (`style={nameStyle(look)}` on the author button,
+`MessageItem.tsx:394`); no theme rule targets them, so server role
+colors are untouched by construction. **Badges/activities (15A-H):**
+artwork is never restyled; status colors come from tokens (V1.0.0 §
+status tokens) and were left as-is.
+
+---
+
 ## What was NOT touched (regression surface)
 
 The theme outputs no JS and touches no Nexa source file. Backend, DB,
@@ -174,7 +226,8 @@ remains clean (verified in TEST_REPORT.md §6).
 | Gap | Impact | Mitigation / status |
 | --- | --- | --- |
 | Voice/call stage in Light preset uses Nexa's purple (data-dark-scope) | Only when mixing OldCord CSS with a Light preset | OldCord is dark-only; README instructs the Dark preset |
-| Profile `.sheet` background uses --oc-primary-660 | Sheet tint fixed in tokens; per-user profile themes still drive their own accents | Documented; `data-themed` cards keep their own palette tokens |
+| Profile `.sheet` background uses --oc-primary-660 | Sheet tint fixed in tokens; per-user profile themes still drive their own accents | **Resolved in V1.1.0:** sheet now set via the `--sheet-bg` token, scoped `:not([data-themed])`, so themed translucent sheets show through |
+| Profile banner with no custom colors | Nexa's deterministic `avatarColor` palette banner shows instead of a dark default | **CSS-only constraint:** inline fallback color is indistinguishable from a user's single accent; theme preserves Nexa's banner (see § Profile color adaptation) |
 | Menu hover uses OldCord's *current* brand-experiment-560 slate-blue | Slightly stronger than Discord's 2020 menu grey | Faithful to what OldCord ships today |
 | Animated replies/threads/timelines follow Nexa's own rules | Some 2020 sub-behaviours (compact density, Lottie) have no token analogue | Cosmetic only; function unchanged |
 | Whitney substitute | Minor typographic difference | Atkinson Hyperlegible via optional Google Fonts @import (see below) |

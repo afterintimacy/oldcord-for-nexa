@@ -309,3 +309,126 @@ sufficient to say PARTIAL is the honest classification: the
 unexercised surfaces above are listed in DELIVERY.md as the remaining
 gate to PASS, and none of them require a single line of the theme
 to change.
+
+---
+
+# Addendum — Phase 15: V1.1.0 profile color adaptation (2026-11-09)
+
+**Date:** 2026-11-09
+**Target:** Nexa `main` @ `3a2ceb95f` (`zeygoober/nexa`), scratch Go
+backend (`chatd` dev binary) at `127.0.0.1:18089`
+**Theme revision:** `work/v1.1.0-visual-refinement` (this file's repo),
+`oldcord.css` 23,505 B — candidate, **not published** (v1.0.0 tag
+untouched)
+
+## 8. What was wrong in V1.0.0 (discovered, not assumed)
+
+V1.0.0's profile rules (style.css, specificity (0,3,0) with the
+`[data-scheme]` ancestor) lost to inline styles but **beat** Nexa's
+`.card[data-themed]` gradient rule (0,2,0) — flattening every prepared
+two-color profile and avatar tint to `#2F3136`, and flattening themed
+translucent sheets. Computed proof under the *true* V1.0.0 file
+(extracted from tag v1.0.0, SHA-256 `1b75566e…`):
+
+| Case | V1.0.0 computed |
+| --- | --- |
+| two-color profile | `data-themed=light` present, but `cardBgImage: none`, `cardBg: rgb(47,49,55)` — gradient gone |
+| two-light profile | gradient gone AND black foregrounds on the `#2F3136` card (unreadable) |
+| themed modal sheets | `rgb(40,42,46)` solid in all cases (translucency flattened) |
+| one-color | banner keeps the accent (inline style beats the stylesheet — already correct in V1.0.0) |
+| default | `#2F3136` shell, sheet `#282A2E`, banner = Nexa's `avatarColor` palette color (inline — the forced `#202225` banner rule never rendered) |
+
+## 9. The fix (style.css only; tokens.css byte-identical to V1.0.0)
+
+- Card shell now applies only to un-themed, un-tinted cards:
+  `:not([data-themed]):not([data-tinted])`.
+- Sheets now set the `--sheet-bg` token to `--oc-primary-660` on
+  `popout|modal|panel` `:not([data-themed])`, instead of a forced sheet
+  `background` — the same computed value for un-themed cards, and
+  themed translucent sheets show through untouched.
+- The dead `.banner` rule is removed (inline styles always win; see
+  §8 table). No `.banner` stylesheet rule may be reintroduced without
+  `!important`, which would break single-accent profiles.
+
+## 10. Probe results (v1.0.0 → v1.1.0), popout + modal
+
+Computed styles from the scratch backend with disposable profile
+colors on bob (evidence: `docs/oldcord-nexa/evidence/phase-15/{v1,v1_1}/`).
+
+| Case | V1.0.0 | V1.1.0 | Verdict |
+| --- | --- | --- | --- |
+| default | `#2F3136` shell, sheet `rgb(40,42,46)` | identical | ✅ unchanged |
+| single `#1C86EE` | banner `rgb(28,134,238)` | identical | ✅ unchanged |
+| two-dark `#8B0E1E→#FF6B6B` | flat `#2F3136`, no image | `linear-gradient(rgb(139,14,30) 0%, rgb(255,107,107) 100%)`, white text | ✅ fixed |
+| two-dark modal sheet | `rgb(40,42,46)` | `rgba(0,0,0,0.3)` (Nexa translucent) | ✅ fixed |
+| two-light `#FFFFFF→#FFD9E8` | flat `#2F3136`, black text on it | white→pink gradient, `rgb(0,0,0)` text | ✅ fixed |
+| two-light modal sheet | `rgb(40,42,46)` | `rgba(255,255,255,0.42)` | ✅ fixed |
+
+Side note: the dumped modal sheets include Nexa's own un-painted inner
+side sheet (`.side` carries the paint via `--sheet-bg`,
+`Profile.module.css:277/283`) — its `rgba(0,0,0,0)` is Nexa's design,
+present in both versions.
+
+## 11. Panel variant (DM column)
+
+Runtime (DM created via `POST /api/v1/users/@me/channels`):
+
+| Case | Result |
+| --- | --- |
+| two-dark panel | `data-themed=light`; gradient intact; sheet `rgba(0,0,0,0.3)` ✅ |
+| default panel | `cardBg rgb(47,49,55)` via `--bg-base` tokens (no OldCord card rule needed), dark sheet ✅ |
+
+## 12. Roles (15A-G)
+
+Runtime (roles created + assigned via the API, worst-case: two-dark
+gradient profile on bob):
+
+- Bob's author name in #general: `rgb(237, 66, 69)` = `#ED4245`
+  (Admins — highest role) ✅
+- Popout role dots: inline `style="background: rgb(...)"` passes
+  through untouched — red `#ED4245` + green `#57F287` ✅
+- Role names (Admins/Mods): `rgb(245, 245, 247)` themed-light
+  foreground, readable on the gradient ✅
+- Member list: bob grouped under "Admins", name in `#ED4245` ✅
+
+Multiple same-pair roles from repeated probe runs (scratch only) —
+harmless; each dot kept its exact server color. No theme rule touches
+role surfaces; this is structural (inline styles) plus now runtime-proven.
+
+## 13. Regression surface
+
+Only the PROFILE section of style.css changed (plus rebuilt
+`oldcord.css`). No tokens, no other selectors. General UI (rail,
+sidebar, member list, composer, message markdown/mentions/code,
+search header) rendered normally in all matrix screenshots; the only
+console errors were media 404s for avatar-less accounts (pre-existing,
+not theme-related).
+
+## 14. What was NOT exercised (honestly not claimed)
+
+- Banner-image and avatar-tint runtime cases — scratch media pipeline
+  returns 500 for image uploads (verified against
+  `media_handlers_test.go` rawPut expectations). Static cover:
+  `.banner` has **no stylesheet background rule at all**, so an inline
+  `background-image` cannot be removed; tints share the exact cascade
+  as the probed two-color gradient (`.card[data-tinted]` is in the same
+  specificity war as `.card[data-themed]`, which V1.1.0 wins by scoping).
+- Profile designer preview (`data-design`) and the public profile page
+  (`variant="modal"`): same `ProfileCard` component and selectors as
+  the probed modal; not runtime-driven (roles/buttons state was left
+  default).
+- Accessibility beyond computed foreground flips: Nexa's own
+  `data-themed` text-shadow and focus-ring logic were preserved by
+  construction; no new animations were added (`prefers-reduced-motion`
+  untouched).
+
+## 15. Final classification (Phase 15 / V1.1.0 candidate)
+
+**PARTIAL** — every runtime-verifiable acceptance criterion passes
+(gradients, single accents, sheets, panel, roles-by-construction), and
+the style change is mechanically tiny; the classification stays at
+PARTIAL (rather than PASS) because §14 lists runtime-unverifiable
+cases (banner images, avatar tints, designer preview) and one
+platform-CSS constraint (the default `avatarColor` banner, see
+IMPLEMENTATION.md § Profile color adaptation). Nothing blocks
+publishing once approved, but the claim is kept honest.

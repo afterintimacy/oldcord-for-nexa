@@ -24,20 +24,23 @@ Everything rides on Nexa's 61 official theme tokens plus the Sass-variables:
 surfaces, hover/selection, mentions (amber 2020 wash + 2 px bar), code
 colors, borders, status colors, radii, and the layout constants above —
 so a preset Dark/Ash theme becomes OldCord with one paste. Selected sidebar
-glyphs turn white, embeds get the 2020 `#4F545C` bar, profile cards use
-primary-630/660/700, reaction pills go square, menus use OldCord's
+glyphs turn white, embeds get the 2020 `#4F545C` bar, profile cards get the
+classic `#2F3136` shell and `#292B2F` sheet **unless the user has chosen
+their own profile colors** — Nexa's per-user profile gradients, single
+accent colors, banner images, avatar tints and role colors are preserved
+(V1.1.0+), reaction pills go square, menus use OldCord's
 `brand-experiment-560` hover.
 
 ## Install
-Use **`oldcord.css`** (22,485 B — well under Nexa's 64 KB snippet and 1 MB
+Use **`oldcord.css`** (23,505 B — well under Nexa's 64 KB snippet and 1 MB
 link limits).
 
 ### Option A — Themes from Links (recommended)
 1. Host `oldcord.css` over HTTPS. Once this repository is published, the raw
-   file URL is the standard way to host it, e.g.
-   `https://raw.githubusercontent.com/<owner>/oldcord-for-nexa/main/oldcord.css`
-   (fill `<owner>` with the GitHub owner once created — no other URL is
-   assumed here).
+   file URL is the standard way to host it:
+   `https://raw.githubusercontent.com/afterintimacy/oldcord-for-nexa/main/oldcord.css`
+   (that is this project's file; re-host a pinned copy if you want an
+   immutable version instead of tracking `main`).
 2. In Nexa: **Settings → Custom CSS → Themes from Links → Add a Link**,
    paste the URL, toggle it on for that device.
 3. In **Settings → Appearance** pick **Dark** (or any dark preset).
@@ -83,6 +86,11 @@ all platforms, and the theme file is plain CSS.
 - Some modern Discord/Nexa screens have no 2020 equivalent (Lottie
   animations, voice-stage quirks) — those keep Nexa's own rendering.
 - Whitney substitute is typographically close, not identical.
+- A profile with **no custom colors and no banner** gets Nexa's own
+  deterministic per-user banner color (`avatarColor`): pure CSS cannot
+  tell it apart from a user's single chosen accent (both are inline styles
+  on the banner), so OldCord preserves Nexa's banner — see
+  `docs/IMPLEMENTATION.md` § Profile color adaptation.
 
 ## Report an issue
 Open an issue in this repository with:
