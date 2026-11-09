@@ -54,12 +54,25 @@ All notable changes to Oldcord for Nexa are documented in this file.
   Computed styles prove gradients, `data-themed` foreground flips and
   the translucent themed sheets are intact under v1.1.0 and were
   flattened under v1.0.0.
-- Runtime-blocked in scratch (media pipeline 500s): banner-image and
-  avatar-tint cases are covered statically — inline `background-image`
-  always wins over stylesheet rules; tints share the same cascade as
-  the probed two-color gradient.
-- Niche platforms: no one uses it there — CSS changes are profile-scoped
-  only; no other component rule changed.
+- Roles runtime proof: two colored roles on a gradient profile —
+  author name in the highest role's color, role dots exact, names
+  readable on the themed card.
+
+### Verified (Phase 15.1 — runtime acceptance, no CSS change)
+- Banner images rendered (popout + modal): inline + computed
+  `background-image`, integration with the avatar cut-out and shell.
+- Avatar-derived tint: `data-tinted` + `--profile-tint` exactly
+  `#1ea05a` (the fixture avatar's dominant color, computed at runtime
+  by Nexa's own canvas path), radial glow over `#18191C`.
+- Profile Designer live preview over real hex inputs + real Save
+  flows: stage glow / banner thumb / preview card all track
+  single/two-dark/two-light/banner/avatar-derived states.
+- Public profile at `/@bob` (logged-out): themed card with banner
+  image, translucent sheets, and a 411×914 one-column layout.
+- Media pipeline caveat: the scratch backend 500s all image uploads;
+  media bytes were served via Playwright route interception, fixtures
+  documented in `docs/TEST_REPORT.md` (Phase 15.1 addendum).
+- Classification: **PASS** (see TEST_REPORT §20).
 
 ## [1.0.0] — 2026-11-08
 

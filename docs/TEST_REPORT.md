@@ -432,3 +432,157 @@ cases (banner images, avatar tints, designer preview) and one
 platform-CSS constraint (the default `avatarColor` banner, see
 IMPLEMENTATION.md § Profile color adaptation). Nothing blocks
 publishing once approved, but the claim is kept honest.
+
+*(Superseded by §20 below: all four cases were verified at runtime in
+Phase 15.1, moving the classification to **PASS**.)*
+
+---
+
+# Addendum — Phase 15.1: dynamic profile runtime acceptance (2026-11-09)
+
+**Date:** 2026-11-09
+**Target:** Nexa `main` @ `3a2ceb95f` — same scratch stack as §8–15
+**Theme revision:** IDENTICAL to the Phase 15 candidate —
+`oldcord.css` 23,505 B, SHA-256 `b3202b0b…`; tokens.css
+`158390c8…`; style.css `d922999d…` (no CSS line changed in Phase 15.1)
+
+## 16. Test environment and fixture methodology
+
+The scratch backend's media pipeline returns **500 Internal** for every
+avatar/banner upload (verified: invalid bodies get proper `400
+unsupported_type`, so request validation runs and something downstream
+in the pipeline fails in this dev binary). To feed the real UI without
+a working upload pipeline, Phase 15.1 uses the brief's sanctioned
+fixtures — **transport-level only**:
+
+1. **Real, locally-generated PNG bytes** serve the two fixture media
+   routes via Playwright route interception:
+   a solid-green avatar (`#1EA05A`) and a purple→blue gradient banner.
+   They carry `Access-Control-Allow-Origin: *` so the browser's
+   `useDominantColor` (`new Image()` + `crossOrigin="anonymous"` +
+   canvas extraction) computes a genuine dominant color from genuine
+   bytes.
+2. **Fixture ids** (`fixture-avatar-01`, `fixture-banner-01`) are spliced
+   into the JSON the client reads — `GET /users/@me`,
+   `GET /users/:id/profile`, `GET /profiles/:name`, and the
+   `POST /auth/login` response's `user` (the auth store's `me` comes
+   from the login POST, not a refetch). That mirrors what a working
+   upload would have stored.
+3. **Everything else is real**: ProfileCard, ProfilePage (designer),
+   `pages/ProfilePage` (public), all of Nexa's CSS, all computed
+   styles, and every backend mutation used (accent PATCH, role
+   create/assign, DM creation, hex-input edits, real Save flows).
+
+No ProfileCard fakes, no computed-style tampering; the app's own
+`setMe` on Save carries ids through the app's own code.
+
+## 17. Results
+
+### 17.1 Banner image (§2 of the brief)
+
+alice opens bob's popout + full modal (banner fixture on, no
+accents, avatar fixture off).
+
+| Check | Result |
+| --- | --- |
+| Inline background image | `background-image: url("/media/banner/fixture-banner-01?size=1024&v=3")` on `.banner` — element present with a real size (320×113) |
+| Computed image | `url("http://127.0.0.1:18089/media/banner/fixture-banner-01?size=512&v=3")` |
+| Card shell | `#2F3136` → `rgb(47, 49, 55)` (theme surface, un-themed) |
+| Tint from banner | `data-tinted` present, `--profile-tint` `#4f33b0` (the banner blend's dominant color, computed by Nexa at runtime) |
+| Text | white `#FFFFFF` name; sheet `#282A2E` — readable |
+| Variants | popout **and** modal — same inline/computed values |
+
+Shots: `banner-popout.png`, `banner-modal.png` — the image sits under
+the avatar with its mask cut-out exactly as Nexa draws it, inside
+OldCord's dark shell and sheet palette.
+
+### 17.2 Avatar-derived tint (§3)
+
+avatar fixture on, banner off, no accents.
+
+| Check | Result |
+| --- | --- |
+| `data-tinted` | present (absent without media) |
+| `--profile-tint` | `#1ea05a` — **exactly** the fixture's solid green |
+| Card image | `radial-gradient(130% 75% at 30% 0%, color(srgb 0.117647 0.627451 0.352941 / 0.24), rgba(0, 0, 0, 0) 72%)` over `rgb(23, 25, 28)` (`--bg-floating` = OldCord `primary-800` #18191C) |
+| Banner fallback | no banner → `avatarColor(id)` hash (`#3D9E60`, the documented CSS limitation) |
+| Variants | popout + modal |
+
+Shots: `tint-popout.png`, `tint-modal.png`.
+
+### 17.3 Profile Designer (§4)
+
+bob's own designer (`?settings=profiles`), real `HexInput` fills +
+real Save buttons (no reloads). Observed through the stage glow
+(`--glow = theme.top ?? tint ?? brand`), the banner thumb, and the
+live preview card.
+
+| Step | Result |
+| --- | --- |
+| Default (no accents, banner+avatar fixtures) | stage glow = banner-dominant tint `#4f33b0`; thumb = fixture banner image; preview = banner image + `data-tinted`; pre-save the store me carries no ids (login-response quirk of the client — see §19) |
+| Single `#1C86EE`, banner on (save) | stage glow keeps banner tint `#4f33b0`; thumb + preview banner keep the image (Nexa precedence: image > accent on the banner); preview un-themed; card tinted |
+| Two-color dark `#1C86EE→#FF6B6B` (save) | stage glow `#1c86ee` (theme top); preview `data-themed=light`, gradient intact, banner image stays |
+| Two-color light `#FFFFFF→#FFD9E8` (save) | stage glow `#ffffff`; preview `data-themed=dark`, black text, image stays |
+| Single `#1C86EE`, banner off (save) | preview banner inline = plain accent `rgb(28, 134, 238)`; un-themed; `#2F3136` shell |
+| Avatar-only (accents cleared, banner off, save) | stage glow `#1ea05a`; preview `data-tinted`, `--profile-tint` `#1ea05a`, green radial over `#17191C`; thumb = `avatarColor` hash fallback (correct: no banner, no accent) |
+
+Shots: `stage-default.png`, `stage-single.png`, `stage-two-dark.png`,
+`stage-two-light.png`, `stage-avatar-tint.png`,
+`designer-single-nobanner.png`. The live preview updates on every
+save, exactly as designed.
+
+### 17.4 Public profile (§5)
+
+logged-out context at `/@bob` (the only public route shape — `/:handle`
+requires the `@`, and signed-in viewers are bounced into the app while
+signed-out visitors get the card inline), bob with two-dark accents,
+avatar+banner fixtures.
+
+| Check | Result |
+| --- | --- |
+| It renders | `data-themed=light`, card gradient `#8B0E1E→#FF6B6B`, banner image fixture (inline + computed), white text, translucent sheet rgba(0,0,0,0.3), page glow filled |
+| Roles/badges | the card renders bob's profile normally; bob holds no badges and the public card has no server context (the Phase-15 roles runtime result stands) |
+| Responsive | 411×914: card collapses to one column (379 px), all sheets/tints intact, nothing overlaps |
+
+Shots: `public-desktop.png`, `public-mobile.png`.
+
+### 17.5 Regression (§6)
+
+No CSS line changed (verified hashes). The runnable suites re-covered:
+popout/modal for default/single/two-dark/two-light (15.1 §1/§2 share
+the same probes), panel (Phase 15 §11), roles (Phase 15 §12). The
+default-popout probe at the end of the Phase 15.1 run matches the
+Phase-15 result exactly.
+
+## 18. What was NOT touched (scope check)
+
+- No CSS changes (not even whitespace — hashes above prove it).
+- No Nexa source changes; `nexa-src` is clean (verified after the runs).
+- No published tag moved or created; all work is on
+  `work/v1.1.0-visual-refinement`, docs addendum on top of `dce62b1`.
+
+## 19. Remaining limitations
+
+1. The scratch **media pipeline** 500s (environment/broken dev
+   binary?). Uploads themselves were not re-testable — only the
+   rendering of their results (fixtures), per the brief's allowance.
+2. A client quirk unrelated to the theme: the app's persisted account
+   record (`ec.accounts`) re-derives `avatar_id` from a stale value
+   and can drop fixture ids across a session — observable here
+   because the backend record is id-less. Harmless for the tests (live
+   store reads happen through the spliced GETs) and irrelevant to a
+   working upload pipeline (the record then matches the DB).
+3. The public card's badges/roles fields render from the real
+   `GET /profiles/:name` (bob holds no badges; no grant API exists
+   for scratch accounts) — fine by construction.
+
+## 20. Classification (Phase 15.1)
+
+All four remaining runtime areas are verified with real components,
+real computed styles and real backend fixtures. **PASS.** The V1.1.0
+candidate is unchanged by this phase; classification moves from
+PARTIAL to **PASS** on the strength of runtime evidence, with the
+documented platform constraint (CSS cannot distinguish Nexa's
+`avatarColor` header from a chosen single accent, see
+IMPLEMENTATION.md) and the fixture caveats in §19. Nothing ships
+without explicit approval.
