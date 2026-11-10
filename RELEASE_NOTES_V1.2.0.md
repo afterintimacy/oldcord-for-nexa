@@ -1,8 +1,8 @@
 # OldCord for Nexa — v1.2.0 release notes
 
-**Status:** staged on `work/v1.2.0-implementation` — **not published**.
-Tags `v1.0.0` / `v1.1.0` are untouched; no force-push; no tag created.
-Do not claim v1.2.0 as released until this is explicitly promoted.
+**Status:** published on `main` at commit `bf2734b`, annotated tag
+`v1.2.0`. Tags `v1.0.0` / `v1.1.0` remain unchanged; no force-push, no
+history rewrite.
 
 ## What changed
 
@@ -66,7 +66,7 @@ proposal of 4 px was not implemented and is not implemented here.
   T6 (uppercase group headings) are deferred to a later revision.
 - V1.2.0 remains dark-only, like V1.1.0; the install URL is unchanged
   (`https://raw.githubusercontent.com/afterintimacy/oldcord-for-nexa/main/oldcord.css`)
-  and points at the published V1.1.0 file until v1.2.0 is promoted.
+  and now serves the V1.2.0 artifact.
 
 ## Verification
 
@@ -95,9 +95,8 @@ Full evidence: `docs/oldcord-nexa/evidence/phase-18/`;
 
 Same as V1.1.0: **Settings → Custom CSS → Themes from Links** (paste the
 URL) or **Snippet** (paste the file contents) → Save → pick the Dark
-preset in Settings → Appearance. The published file remains V1.1.0
-until v1.2.0 is promoted; a staged build lives at
-`work/v1.2.0-implementation` in this repository.
+preset in Settings → Appearance. The raw install URL is
+`https://raw.githubusercontent.com/afterintimacy/oldcord-for-nexa/main/oldcord.css`.
 
 ## License
 

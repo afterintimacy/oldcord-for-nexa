@@ -2,11 +2,11 @@
 
 All notable changes to Oldcord for Nexa are documented in this file.
 
-## [1.2.0] — staged (not released)
+## [1.2.0] — 2026-11-09 (published)
 
-Staged on `work/v1.2.0-implementation`; **not published** — tags
-`v1.0.0` / `v1.1.0` are untouched, no force-push, no tag created, and
-V1.2.0 is not claimed as released anywhere.
+Published on `main` at commit `bf2734b`, annotated tag `v1.2.0`.
+Tags `v1.0.0` / `v1.1.0` remain unchanged; no force-push, no history
+rewrite.
 
 ### Added
 - T1 — settings shell flattened to `--bg-base` (`#2F3136`): removes the
