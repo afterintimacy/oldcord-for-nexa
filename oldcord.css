@@ -449,20 +449,49 @@
   --sheet-bg: var(--oc-primary-660);
 }
 
+/* ── SETTINGS (user + server settings layer) ──────────────────────────────
+   Phase 17 D-1: the shell is Settings.module `.layer`, which paints a
+   radial --canvas-glow (13% of --brand) over --bg-canvas. That blurple
+   wash is the only stock-Nexa residue; controls already use the 2020
+   tokens (switch --grad-brand, radios/sliders --brand, hover --bg-hover,
+   text --text/--text-muted). Flatten to --bg-base (#2F3136) for the
+   classic two-tone shell. Scoped by [data-modal-layer] plus a direct
+   child unique to Settings.module (_navWrap_ / _contentWrap_). */
+[data-scheme="dark"] [data-modal-layer]:has(> [class*="_navWrap_"], > [class*="_contentWrap_"]) {
+  background: var(--bg-base);
+}
+
 /* ── PICKER (emoji / stickers / gifs) ──────────────────────────────────────
-   Nexa sources: components/pickers/Picker.module.css (`.pop` — the
-   498px pop layer; `.pop` is also a local in UserPanel and ServerTag,
-   but only Picker's pop contains an emoji `.grid`). 2020 radius 8px. */
+   Nexa: Picker.module.css `.pop` (498px layer; only Picker's pop contains
+   an emoji `.grid`). The 2020 reference uses 8px for both the expression
+   wrapper (redesign.css .contentWrapper_58b0l2) and the emoji picker
+   (--custom-emoji-picker-border-radius: 8px); --radius-lg here is 5px, so
+   this restores 8px. (Phase 17 E-1's 4px is not supported by the
+   reference — TEST_REPORT §22.) */
 [data-scheme="dark"] [class*="_pop_"]:has([class*="_grid_"]) {
   border-radius: 8px;
 }
 
-/* ── Threads, member list, tooltips, popovers, scrollbars, members ────────
-   All of these draw from tokens (bg-hover, bg-floating, scroll-thumb,
-   tooltip-bg, text-channel...), which tokens.css already maps to the
-   2020 palette. Nexa's own Rules (Chat/Threads/MemberList modules) are
-   already OldCord-shaped — the member rows get their radius from
-   --radius-sm (3px) automatically. No extra component rules needed. */
+/* ── TOOLTIP ───────────────────────────────────────────────────────────
+   Tooltip.tsx writes --tooltip-bg/--tooltip-text inline per bubble (host
+   surface mixed into the violet INK #120d1d), so the theme's
+   --tooltip-bg: #000 token never reached it (measured rgb(27,25,36);
+   Phase 17 E-2). Re-asserting the token's value on the bubble makes the
+   component's own background/arrow rules resolve to #000; the inline
+   white foreground stays readable. !important is required because the
+   overridden value is inline, and is scoped to the bubble only. */
+[data-scheme="dark"] [class*="_tip_"] {
+  --tooltip-bg: #000 !important;
+}
+
+/* ── Threads, member list, other popovers, scrollbars, members ─────────
+    All of these draw from tokens (bg-hover, bg-floating, scroll-thumb,
+    text-channel...), which tokens.css already maps to the
+    2020 palette. Nexa's own Rules (Chat/Threads/MemberList modules) are
+    already OldCord-shaped — the member rows get their radius from
+    --radius-sm (3px) automatically. (Tooltips are the exception above —
+    their bubble is JS-painted, not token-driven.) No extra component
+    rules needed. */
 
 /* ── Reduced motion ─────────────────────────────────────────────────────────
    This theme introduces no animations of its own; the app's `[data-reduced-

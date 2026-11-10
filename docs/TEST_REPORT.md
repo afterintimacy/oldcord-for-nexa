@@ -605,3 +605,173 @@ one. The `chatd` storage startup had one flaky window while the
 backend was reaped between shell sessions (no panic trace; startup
 logs clean) — operationally irrelevant to the theme and noted for
 transparency.
+
+---
+
+# Addendum — Phase 18: V1.2.0 acceptance (T1 settings, T2 tooltip, T3 picker) (2026-11-09)
+
+**Date:** 2026-11-09
+**Target:** Nexa `main` @ `3a2ceb95f` (`zeygoober/nexa`), scratch Go
+backend at `127.0.0.1:18089`
+**Theme revision:** `work/v1.2.0-implementation` — **staged, not published**
+(oldcord.css 25,631 B, SHA-256 `0b7d4b9f…`; style.css 17,319 B,
+SHA-256 `9c3471fc…`, 35 rules (+2 vs V1.1.0), 2 `!important`; tokens.css
+7,874 B, SHA-256 `158390c8…`, unchanged)
+**Scope:** T1 (settings shell), T2 (tooltip bubble), T3 (emoji picker
+radius) only. Tags `v1.0.0` / `v1.1.0` and the published artifact
+(`b3202b0b…`) are untouched; no force-push, no tag created. **Do not
+claim V1.2.0 is published.**
+
+## 22. Method
+
+Both versions were installed *through the real Custom CSS UI* —
+Settings → Custom CSS → paste into the `[data-testid="css-snippet"]`
+editor → click `[data-testid="save"]` → PUT
+`/api/v1/users/@me/settings` (200) — exactly as a person would. The
+theme then persists through the account's settings store and Nexa's
+`ec:look:css` first-frame cache (`#nexa-custom-css` at end of body),
+so reloads exercise real persistence rather than re-injection.
+Measurements are computed styles captured by Playwright at
+1366×768 and 411×914; screenshots and `results.json` live under
+`docs/oldcord-nexa/evidence/phase-18/`.
+
+## 23. T1 — settings shell (flatten the layer)
+
+The Phase 17 audit's finding D-1 ("settings shell is stock Nexa purple")
+was a false positive: its script applied the theme only *after*
+`page.goto`, so it measured Nexa's un-themed default palette
+(`#1c1825` / `#8000ff`). With the theme actually installed via the
+Custom CSS UI, every control already draws from the 2020 tokens —
+switches `--grad-brand` = `rgb(114, 136, 218)` blurple, radios/sliders/
+selection `--brand`, hover `--bg-hover`, text `--text`/`--text-muted`,
+flat blurple primary buttons — so no control rule was needed.
+
+The one real residue was the shell itself: Settings.module's `.layer`
+paints `radial-gradient(... var(--canvas-glow) ...)` over
+`--bg-canvas`, and `--canvas-glow` is 13% of `--brand` — a blurple wash
+the flat 2020 settings never had. V1.2.0 flattens it to
+`var(--bg-base)` (`#2F3136`), one rule:
+
+```css
+[data-scheme="dark"] [data-modal-layer]:has(> [class*="_navWrap_"],
+> [class*="_contentWrap_"]) {
+  background: var(--bg-base);
+}
+```
+
+| Surface | V1.1.0 computed | V1.2.0 computed |
+|---|---|---|
+| layer background (privacy/notifications/appearance/customCss) | `oklab(0.22…)` + `radial-gradient(color(srgb 0.447 0.534967 0.853 / 0.13) …)` | `rgb(47, 49, 55)` (paints `--bg-base`; `background-image: none`) |
+| content panel | `rgb(54, 57, 63)` | `rgb(54, 57, 63)` (unchanged) |
+| switch on | `linear-gradient(…, rgb(114, 136, 218) …)` | identical |
+| nav hover / selected | `rgba(80, 85, 94, 0.16)` / `rgba(80, 85, 94, 0.32)` | identical |
+| tokens | unchanged across versions | unchanged |
+
+Verified at 1366×768 (desktop: `navWrap` + `contentWrap` direct children
+of `[data-modal-layer]`) and 411×914 (narrow: list view flattens the
+`navWrap` child; choosing a page swaps to the `contentWrap` child — both
+`rgb(47, 49, 55)`). No clipping; no control regression.
+
+**Computed-value note (`rgb(47, 49, 55)` vs `#2F3136`).** The token is
+`--bg-base: var(--oc-primary-630)` = `hsl(223 7% 20%)` (documented in
+`tokens.css` as `/* #2F3136 — background-secondary */`; the `≈` in the
+IMPLEMENTATION.md token table acknowledges it is approximate). The
+browser converts `hsl(223 7% 20%)` to `rgb(47, 49, 55)` because its blue
+channel (54.57) rounds up to 55, while the hex constant `#2F3136` is
+exactly `rgb(47, 49, 54)`. That one-channel gap is a browser hsl→rgb
+rounding artifact, not a real color difference: the layer paints the
+intended `--bg-base` token either way. Per the one-channel rule, no
+color was altered to close it.
+
+## 24. T2 — tooltip bubble (black, like 2020)
+
+Nexa's `Tooltip.tsx` computes bubble colors per tooltip at runtime
+(`tooltipPaint()` mixes the host surface into INK `#120d1d`) and writes
+them as **inline** custom properties (`--tooltip-bg`, `--tooltip-text`)
+on the bubble — an inline custom property beats every stylesheet
+declaration of the same name, so the theme's `--tooltip-bg: #000`
+token never reached the bubble (V1.1.0 measured `rgb(27, 25, 36)` /
+`#1b1924`). V1.2.0 re-asserts the token on the bubble — one `!important`,
+required because the overridden value is inline, scoped to the bubble
+only:
+
+```css
+[data-scheme="dark"] [class*="_tip_"] { --tooltip-bg: #000 !important; }
+```
+
+The component's own `background: var(--tooltip-bg)` and its arrow's
+`border-*-color: var(--tooltip-bg)` then resolve to #000; the
+JS-picked foreground stays white and readable.
+
+| | V1.1.0 | V1.2.0 |
+|---|---|---|
+| background | `rgb(27, 25, 36)` | `rgb(0, 0, 0)` |
+| `--tooltip-bg` | `#1b1924` (surface-derived ink) | `#000` |
+| text color | `rgb(255, 255, 255)` | `rgb(255, 255, 255)` |
+| arrow top | `rgb(27, 25, 36)` | `rgb(0, 0, 0)` |
+| position / clipping | sane, not clipped | sane, not clipped |
+
+Hide-on-mouse-out, Escape-dismiss and positioning come from the
+component itself and are unchanged.
+
+## 25. T3 — emoji picker radius (closed: not a defect)
+
+OldCord's reference sets 8 px on both the expression-picker wrapper
+(`redesign.css` `.contentWrapper_58b0l2`) and the emoji picker
+(`--custom-emoji-picker-border-radius: 8px` in `vars.css`). The
+theme's existing rule restoring 8 px on
+`[class*="_pop_"]:has([class*="_grid_"])` is therefore correct as-is;
+Phase 17's E-1 (4 px) is unsupported by the reference and was **not**
+implemented.
+
+| | V1.1.0 | V1.2.0 |
+|---|---|---|
+| radius / corners | `8px` × 4 | `8px` × 4 |
+| size | 498 × 498 | 498 × 498 |
+| narrow (411×914) | 411 × 548, not clipped | 411 × 548, not clipped |
+| search ("smile") | 26 results, no "No emoji match" | 26 results |
+| category buttons / scroll / pick → composer | 218 buttons, scroll 0→400 of 7656, 😀 inserted into composer | identical |
+
+## 26. Persistence
+
+Reduced motion toggled on in Settings → Appearance → Accessibility,
+then re-opened on a fresh load: stays on. Toggled off, re-opened: stays
+off. The theme itself persists across reload — the saved snippet is
+reapplied from the account store and `#nexa-custom-css` is present with
+all markers (`--tooltip-bg: #000 !important`, T1 selector, picker
+rule) after every reload.
+
+## 27. Regression spot-checks (vs Phase 17 baseline)
+
+| Surface | V1.2.0 computed | Assessment |
+|---|---|---|
+| chat scheme | dark | ✓ |
+| context menu | `rgb(23, 25, 28)`, radius `4px`, 16 items | ✓ unchanged |
+| search panel | `rgb(54, 57, 63)`, radius `0px` | ✓ unchanged |
+| profile modal | `rgb(47, 49, 55)`, radius `5px`, no gradient image | ✓ unchanged (user themes preserved) |
+| member list | `rgb(47, 49, 55)`, width 240 | ✓ unchanged |
+| composer wrap | `rgba(0, 0, 0, 0.1)` | ✓ unchanged |
+
+No member-list, search, notification, profile, chat-layout, reaction,
+server-nav or composer changes were made — none are in Phase-18 scope.
+
+## 28. Console
+
+One pre-existing, theme-unrelated 404 (update-check endpoint on the
+scratch server, present without the theme too). Zero theme-caused
+errors at either viewport.
+
+## 29. CSS budget
+
+`style.css`: 33 → 35 rules (+2: the T1 layer rule and the T2 token
+rule), +1,795 B (15,524 → 17,319 B).
+`oldcord.css`: 23,505 → 25,631 B (+2,126 B — under the 3 KB Phase-18
+CSS budget, under the 64 KB snippet and 1 MB link limits).
+2 `!important` total; braces balanced 40/40.
+
+## 30. Classification
+
+All three targets verified through the real UI at both reference
+viewports, with persistence and regressions checked. **V1.2.0 is staged
+on `work/v1.2.0-implementation` and is not published.** Release
+recommendation: RC-ready pending maintainer approval.

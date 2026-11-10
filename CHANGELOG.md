@@ -2,6 +2,46 @@
 
 All notable changes to Oldcord for Nexa are documented in this file.
 
+## [1.2.0] — staged (not released)
+
+Staged on `work/v1.2.0-implementation`; **not published** — tags
+`v1.0.0` / `v1.1.0` are untouched, no force-push, no tag created, and
+V1.2.0 is not claimed as released anywhere.
+
+### Added
+- T1 — settings shell flattened to `--bg-base` (`#2F3136`): removes the
+  `--canvas-glow` (13% of `--brand`) blurple wash on Settings.module's
+  `.layer`; scoped to
+  `[data-modal-layer]:has(> [class*="_navWrap_"], > [class*="_contentWrap_"])`
+  only; every control keeps its 2020 token (1 rule, no `!important`).
+- T2 — tooltip bubble: re-asserts `--tooltip-bg: #000 !important` on
+  `[class*="_tip_"]`, because `Tooltip.tsx` writes the bubble colors
+  inline per tooltip (measured `rgb(27, 25, 36)` → `rgb(0, 0, 0)`,
+  white text, black arrow; 1 rule, 1 `!important` scoped to the bubble).
+
+### Corrected premises (not implemented literally)
+- T3 — emoji picker radius stays 8 px: the 2020 reference uses 8 px, so
+  Phase 17's proposed 4 px was not implemented (TEST_REPORT §22–25).
+- Phase 17 D-1 was a false positive (theme applied after `page.goto`);
+  E-1's 4 px is unsupported by the reference.
+
+### Deferred (out of Phase-18 scope)
+- T4 — selected reaction pill solid blurple; T5 — settings nav bar 3 px;
+  T6 — group headings uppercase.
+
+### Verified (Phase 18 acceptance)
+Installed through the real Custom CSS UI and measured via computed
+styles at 1366×768 and 411×914: settings shell `rgb(47, 49, 55)` /
+`background-image: none` on privacy/notifications/appearance/customCss
+(including narrow list→page), tooltip `rgb(0, 0, 0)`/white/not clipped,
+picker 8 px on all corners with working search/categories/scroll/cell
+pick, reduced-motion persistence across reload, no regressions in member
+list/search/context menu/profile/chat. Evidence:
+`docs/oldcord-nexa/evidence/phase-18/`; TEST_REPORT §22–30.
+
+CSS budget: +2 rules, +2,126 B (23,505 → 25,631 B — under the 64 KB
+snippet and 1 MB link limits); braces balanced.
+
 ## [1.1.0] — 2026-11-09 (published)
 
 ### Added

@@ -32,15 +32,17 @@ accent colors, banner images, avatar tints and role colors are preserved
 `brand-experiment-560` hover.
 
 ## Install
-Use **`oldcord.css`** (23,505 B — well under Nexa's 64 KB snippet and 1 MB
-link limits).
+Use **`oldcord.css`** (25,631 B staged for V1.2.0 — well under Nexa's 64 KB
+snippet and 1 MB link limits; the currently published V1.1.0 file at the URL
+below is 23,505 B until V1.2.0 is promoted).
 
 ### Option A — Themes from Links (recommended)
 1. Host `oldcord.css` over HTTPS. Once this repository is published, the raw
    file URL is the standard way to host it:
    `https://raw.githubusercontent.com/afterintimacy/oldcord-for-nexa/main/oldcord.css`
    (that is this project's file; re-host a pinned copy if you want an
-   immutable version instead of tracking `main`).
+   immutable version instead of tracking `main`). The URL currently serves
+   the published V1.1.0 artifact.
 2. In Nexa: **Settings → Custom CSS → Themes from Links → Add a Link**,
    paste the URL, toggle it on for that device.
 3. In **Settings → Appearance** pick **Dark** (or any dark preset).
@@ -89,6 +91,30 @@ installation mechanism on Nexa Web, and the theme file is plain CSS.
   tell it apart from a user's single chosen accent (both are inline styles
   on the banner), so OldCord preserves Nexa's banner — see
   `docs/IMPLEMENTATION.md` § Profile color adaptation.
+
+## What's new in V1.2.0 (staged — not yet published)
+
+V1.2.0 adds two component rules (no token changes, no selectors
+outside settings/tooltip/picker) on top of V1.1.0. It is staged on
+`work/v1.2.0-implementation`; `v1.1.0` remains the latest release and
+the install URL above still points at the published file.
+
+- **T1 — settings shell:** the settings layer's `radial-gradient`
+  `--canvas-glow` wash (13% of brand) is flattened to `--bg-base`
+  (`#2F3136`), giving the classic two-tone 2020 settings shell.
+  Scoped to `[data-modal-layer]:has(> [class*="_navWrap_"],
+  > [class*="_contentWrap_"])` only; every control keeps its token.
+- **T2 — tooltip:** `Tooltip.tsx` writes `--tooltip-bg` inline per
+  bubble, so the theme token never reached it. V1.2.0 re-asserts
+  `--tooltip-bg: #000 !important` on the bubble; the component's own
+  background/arrow rules then render the classic black 2020 tooltip
+  with white text.
+- **T3 — picker radius:** verified correct at 8 px (the 2020 reference
+  uses 8 px; the Phase 17 proposal of 4 px was not implemented). No
+  change.
+
+CSS budget: +2 rules, +2,126 B (25,631 B total — under the 64 KB
+snippet and 1 MB link limits).
 
 ## Report an issue
 Open an issue in this repository with:

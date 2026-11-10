@@ -15,9 +15,9 @@ the selectors the app's own Custom CSS documentation blesses.
 
 | File | About | Size |
 | --- | --- | --- |
-| `oldcord.css` | The installable file: tokens + component CSS + optional Google Fonts @import (first line). Install via **Settings → Custom CSS → Themes from Links** or paste into a **Snippet**. | 23,505 B (< 64 KB snippet, < 1 MB link) |
+| `oldcord.css` | The installable file: tokens + component CSS + optional Google Fonts @import (first line). Install via **Settings → Custom CSS → Themes from Links** or paste into a **Snippet**. | 25,631 B (< 64 KB snippet, < 1 MB link) |
 | `tokens.css` | Source of the token file above (everything after the @import line). | 7,874 B |
-| `style.css` | Source of the component file above. | 15,524 B |
+| `style.css` | Source of the component file above. | 17,319 B |
 | `README.md` | Install instructions and feature list. | |
 | `IMPLEMENTATION.md` | This file. | |
 | `COMPATIBILITY.md` | Platform matrix, safe mode, failure modes. | |
@@ -194,6 +194,90 @@ flattened every user gradient to `#2F3136`. Scoping with
 `:not([data-themed])` is the minimal fix; it changes nothing for
 un-themed cards.
 
+### Settings layer (Phase 18, V1.2.0 — T1)
+
+The Phase 17 audit's D-1 ("settings shell is stock Nexa purple") was a
+false positive: the audit applied the theme only *after* `page.goto`, so
+it measured Nexa's un-themed default palette, not the persisted theme.
+With the theme actually installed via Settings → Custom CSS, every
+control already draws from the 2020 tokens — switches use `--grad-brand`
+(`#7288DA` blurple), radios/sliders/selection use `--brand`, hover uses
+`--bg-hover`, text uses `--text`/`--text-muted`, primary buttons are
+flat blurple — so no control rule is needed.
+
+The one real residue was the shell itself: Settings.module's `.layer`
+paints `radial-gradient(... var(--canvas-glow) ...)` over `--bg-canvas`,
+and `--canvas-glow` is 13% of `--brand` — a blurple wash the flat 2020
+settings never had. V1.2.0 flattens that layer to `var(--bg-base)`
+(`#2F3136`), giving the classic two-tone shell (sidebar `#2F3136`,
+content panel `--bg-raised` `#36393F`). Scoped to the settings layer
+only, via `[data-modal-layer]` plus a direct child unique to
+Settings.module (`_navWrap_` on the desktop/mobile list,
+`_contentWrap_` on the mobile page):
+
+```css
+[data-scheme="dark"] [data-modal-layer]:has(> [class*="_navWrap_"],
+> [class*="_contentWrap_"]) {
+  background: var(--bg-base);
+}
+```
+
+Measured before/after through the real Custom CSS UI: layer background
+`oklab(0.22…)` + `radial-gradient(...)` → `rgb(47, 49, 55)` with
+`background-image: none`; content panel stays `rgb(54, 57, 63)`;
+switch gradient, nav hover and selected states, and every token are
+unchanged; identical at 1366×768 and 411×914.
+
+**Computed-value note (`rgb(47, 49, 55)` vs `#2F3136`).** The token is
+`--bg-base: var(--oc-primary-630)` = `hsl(223 7% 20%)` (the comment in
+`tokens.css` marks it `/* #2F3136 — background-secondary */`; the
+`≈` in the token table acknowledges it is approximate). The browser
+converts `hsl(223 7% 20%)` to `rgb(47, 49, 55)` because its blue channel
+(54.57) rounds up to 55, while the hex constant `#2F3136` is exactly
+`rgb(47, 49, 54)`. That one-channel gap is a browser hsl→rgb rounding
+artifact, not a real color difference: the layer paints the intended
+`--bg-base` token either way. Per the one-channel rule, no color was
+altered to close it.
+
+### Picker radius (Phase 18, V1.2.0 — T3)
+
+**Not a defect — kept at 8 px.** OldCord's reference sets 8 px on both
+the expression-picker wrapper (`redesign.css` `.contentWrapper_58b0l2`)
+and the emoji picker's bottom corners
+(`--custom-emoji-picker-border-radius: 8px` in `vars.css`). Nexa's
+`--radius-lg` maps to 5 px, so the theme's existing rule restoring
+8 px on `[class*="_pop_"]:has([class*="_grid_"])` is correct as-is.
+Phase 17's E-1 (4 px) is unsupported by the reference and was not
+implemented (see TEST_REPORT §22).
+
+### Tooltip (Phase 18, V1.2.0 — T2)
+
+Nexa's `Tooltip.tsx` computes bubble colors per tooltip at runtime
+(`tooltipPaint(): mixOk(under, INK, …)` from the underlying surface,
+INK `#120d1d`) and writes them as **inline** custom properties
+(`--tooltip-bg: paint.bg`, `--tooltip-text`) on the bubble — an inline
+custom property beats every stylesheet declaration of the same name,
+which is why the mapped `--tooltip-bg: #000` token never reached the
+bubble (measured `rgb(27, 25, 36)`; Phase 17 finding E-2).
+
+V1.2.0 re-asserts the token's value on the bubble with `!important`
+(required because the overridden value is inline, scoped to the bubble
+only):
+
+```css
+[data-scheme="dark"] [class*="_tip_"] {
+  --tooltip-bg: #000 !important;
+}
+```
+
+The component's own rules then consume it: `background: var(--tooltip-bg)`
+and the arrow's `border-*-color: var(--tooltip-bg)` resolve to #000,
+while the JS-picked foreground (white over that ink) stays readable.
+Measured before/after through the real Custom CSS UI:
+`rgb(27, 25, 36)` / `--tooltip-bg: #1b1924` → `rgb(0, 0, 0)` /
+`--tooltip-bg: #000`, white text, black arrow, not clipped, at both
+viewports.
+
 **The CSS-only constraint (15A-A vs 15A-C).** The spec asks for a
 `#202225` default banner, but a profile with no colors gets its banner
 color inline (`background: rgb(61, 158, 96)` etc., from `avatarColor`)
@@ -272,7 +356,11 @@ the files unverified — treat as unredistributable). The theme instead:
    `tokens.css`/`style.css` (the single `https://` in the repo is the
    documented Google Fonts `@import` in `oldcord.css`).
 2. **Syntax check**: both files parse in PostCSS (vite pipeline):
-   `tokens.css` 2 rules, `style.css` 34 rules, `oldcord.css` 36 rules.
+   `tokens.css` 2 rules, `style.css` 35 rules (+2 vs V1.1.0), `oldcord.css`
+   37 rule groups (+2 vs V1.1.0; 25,631 B on disk, +2,126 B — under the
+   3 KB Phase-18 CSS budget, the 64 KB snippet limit and the 1 MB link
+   limit), 2 `!important` (tooltip only; settings layer has none),
+   braces balanced 40/40.
 3. **Compiled-CSS check** (vite build → dist): *the generated class
    names* in `dist/assets/*.css` were extracted and every fragment in
    `style.css` was asserted to match at least one emitted class name
