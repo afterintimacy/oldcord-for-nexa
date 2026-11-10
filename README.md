@@ -32,8 +32,9 @@ accent colors, banner images, avatar tints and role colors are preserved
 `brand-experiment-560` hover.
 
 ## Install
-Use **`oldcord.css`** (25,631 B — well under Nexa's 64 KB snippet and 1 MB
-link limits).
+Use **`oldcord.css`** (25,300 B — well under Nexa's 64 KB snippet and 1 MB
+link limits; the published GitHub LF blob is 25,300 bytes; a Windows
+working copy with CRLF line endings measures 25,631 bytes).
 
 ### Option A — Themes from Links (recommended)
 1. Host `oldcord.css` over HTTPS. Once this repository is published, the raw
@@ -110,15 +111,18 @@ outside settings/tooltip/picker) on top of V1.1.0.
   reference uses 8 px; the Phase 17 proposal of 4 px was not
   implemented). No change — the picker retains its original 8px radius.
 
-CSS budget: +2 rules, +2,126 B (25,631 B total — under the 64 KB
+CSS budget: +2 rules, +2,126 B (25,300 B total — under the 64 KB
 snippet and 1 MB link limits).
 
 ## Report an issue
 Open an issue in this repository with:
 1. The `oldcord.css` version/commit you installed,
-2. browser (and OS) version,
+2. browser and operating system version,
 3. a screenshot of the broken state,
 4. whether it reproduces with and without the theme.
+
+Please include your **browser and operating system** version (Nexa Web
+is the only supported platform; Desktop and Android are not supported).
 
 ## License
 MIT — see `LICENSE`. Based on milbits/oldcord (MIT); the OldCord/Discord

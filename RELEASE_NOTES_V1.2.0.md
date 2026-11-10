@@ -1,8 +1,11 @@
 # OldCord for Nexa — v1.2.0 release notes
 
-**Status:** published on `main` at commit `bf2734b`, annotated tag
-`v1.2.0`. Tags `v1.0.0` / `v1.1.0` remain unchanged; no force-push, no
-history rewrite.
+**Status:** published on `main` at commit `3ce8498`, annotated tag
+`v1.2.0` (tag object `f872c260be2ac2e2d30335cd03be3c943f37af25`) pointing
+to commit `3ce8498`. The CSS implementation commit is `bf2734b` ("Oldcord
+for Nexa v1.2.0"); `3ce8498` is the documentation-finalization commit
+that fast-forwards `main`. Tags `v1.0.0` / `v1.1.0` remain unchanged; no
+force-push, no history rewrite.
 
 ## What changed
 
@@ -10,7 +13,10 @@ V1.1.0 established the Discord-2020 look on Nexa's Custom CSS system
 and adapted profile colors to Nexa's per-user customization. V1.2.0 is
 a minimal, targeted refinement: exactly two component rules (no token
 changes, no selectors outside settings/tooltip/picker), under the
-Phase-18 CSS budget (+2 rules, +2,126 B → 25,631 B total).
+Phase-18 CSS budget (+2 rules, +2,126 B). The published GitHub LF blob
+(`oldcord.css`) is 25,300 bytes; the Windows CRLF working copy measures
+25,631 bytes — both well under Nexa's 64 KB snippet and 1 MB link
+limits.
 
 ### T1 — settings shell (flatten the layer)
 
